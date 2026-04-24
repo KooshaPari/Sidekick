@@ -1,5 +1,7 @@
 # Sidekick — Agent Utility Collection
 
+![Sidekick Logo](assets/logo-placeholder.svg)
+
 A named Rust workspace consolidating core agent infrastructure utilities for the Phenotype ecosystem.
 
 ## Components
