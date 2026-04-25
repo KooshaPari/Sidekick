@@ -4,8 +4,12 @@
 //! Source: external agent-imessage MCP server (claudeai-proxy)
 //! Reference: `mcp__agent-imessage__*` tool suite in Claude Code
 
+use phenotype_errors::PhenoError;
 use serde::{Deserialize, Serialize};
 use std::fmt;
+
+/// Messaging result type.
+pub type Result<T> = std::result::Result<T, PhenoError>;
 
 /// Supported messaging providers.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -47,34 +51,11 @@ impl Message {
 /// Messaging adapter trait for pluggable provider implementations.
 pub trait MessagingAdapter: Send + Sync {
     /// Send a message via the provider.
-    fn send(&self, message: &Message) -> Result<String, MessagingError>;
+    fn send(&self, message: &Message) -> Result<String>;
 
     /// Check if recipient has the provider available.
-    fn is_available(&self, recipient: &str) -> Result<bool, MessagingError>;
+    fn is_available(&self, recipient: &str) -> Result<bool>;
 }
-
-/// Messaging errors.
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(tag = "error_type")]
-pub enum MessagingError {
-    ProviderNotAvailable { provider: String },
-    InvalidRecipient { recipient: String },
-    SendFailed { reason: String },
-    ConfigurationError { reason: String },
-}
-
-impl fmt::Display for MessagingError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Self::ProviderNotAvailable { provider } => write!(f, "Provider not available: {}", provider),
-            Self::InvalidRecipient { recipient } => write!(f, "Invalid recipient: {}", recipient),
-            Self::SendFailed { reason } => write!(f, "Send failed: {}", reason),
-            Self::ConfigurationError { reason } => write!(f, "Configuration error: {}", reason),
-        }
-    }
-}
-
-impl std::error::Error for MessagingError {}
 
 #[cfg(test)]
 mod tests {
@@ -93,5 +74,11 @@ mod tests {
         assert_eq!(MessageProvider::IMessage.to_string(), "iMessage");
         assert_eq!(MessageProvider::SMS.to_string(), "SMS");
         assert_eq!(MessageProvider::Email.to_string(), "Email");
+    }
+
+    #[test]
+    fn test_error_usage() {
+        let err: Result<()> = Err(PhenoError::Unauthorized("invalid token".to_string()));
+        assert!(err.is_err());
     }
 }
