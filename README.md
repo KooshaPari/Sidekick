@@ -77,6 +77,17 @@ See `../../phenotype-bus/README.md` and `docs/org-audit-2026-04/collection_build
 
 Crates published to crates.io under `sidekick-*` prefix.
 
+## See Also
+
+Explore Sidekick and other Phenotype collections at the [Collections Showcase](https://dev.phenotype.io/collections).
+
+**Sibling Collections:**
+- **[Eidolon](../Eidolon)** — Unified trait-based device automation (desktop, mobile, sandbox)
+- **[Stashly](../Stashly)** — Storage & persistence (caching, event sourcing, state machines)
+- **[Observably](../PhenoObservability)** — Observability & distributed tracing
+- **[Paginary](../Paginary)** — Knowledge collection (specs, tutorials, handbooks)
+- **[phenotype-shared](../phenoShared)** — Rust infrastructure toolkit (domain, application, ports)
+
 ## License
 
 Apache 2.0
