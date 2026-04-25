@@ -1,32 +1,25 @@
-# AGENTS.md — Sidekick Agent Instructions
+# AGENTS.md — Sidekick
 
-This project is part of the Phenotype ecosystem. All agent work is tracked in AgilePlus.
+Phenotype repository
 
-## Quick Reference
+## Quick Links
 
-- **AgilePlus**: `/Users/kooshapari/CodeProjects/Phenotype/repos/AgilePlus`
-- **Global instructions**: `~/.claude/CLAUDE.md`
-- **Project instructions**: `./CLAUDE.md` (this repo)
-- **Worklog aggregation**: `/Users/kooshapari/CodeProjects/Phenotype/repos/worklogs/`
+- **Local CLAUDE.md:** See `CLAUDE.md` in this repository for project-specific guidance
+- **Phenotype org governance:** `/Users/kooshapari/CodeProjects/Phenotype/repos/CLAUDE.md`
+- **Global agent guidance:** `~/.claude/AGENTS.md`
+- **AgilePlus work tracking:** `cd /repos/AgilePlus && agileplus <command>`
 
-## Workflows
+## Key Workflows
 
-1. **Before implementing**: Check AgilePlus spec (`agileplus specify --title "..."`)
-2. **During work**: Update status (`agileplus status <id> --wp <wp-id> --state <state>`)
-3. **On completion**: Document in project worklog (if cross-cutting)
+1. **Before implementing:** Check AgilePlus for existing specs
+2. **Quality gates:** Run linters, tests, and docs validation (see CLAUDE.md)
+3. **Worktrees:** Use `repos/Sidekick-wtrees/<topic>/` for feature work
+4. **Integration:** Commit to canonical repo (`main`) after quality gates pass
 
-## Multi-Crate Builds
+## Project-Specific Gotchas
 
-```bash
-cargo build --release --workspace
-cargo test --workspace
-cargo clippy --workspace -- -D warnings
-cargo fmt --check
-```
+See CLAUDE.md for language stack, build commands, and testing requirements.
 
-Delegate file exploration and multi-file analysis to subagents. Keep parent agent context for strategic decisions.
+---
 
-## See Also
-
-- `/Users/kooshapari/CodeProjects/Phenotype/repos/CLAUDE.md` — Phenotype workspace rules
-- `/Users/kooshapari/CodeProjects/Phenotype/CLAUDE.md` — Phenotype org governance
+**Parent contract:** Extends Phenotype-org governance. See `CLAUDE.md` and parent `AGENTS.md` for complete operating procedures.
