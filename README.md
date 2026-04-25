@@ -88,6 +88,34 @@ Explore Sidekick and other Phenotype collections at the [Collections Showcase](h
 - **[Paginary](../Paginary)** — Knowledge collection (specs, tutorials, handbooks)
 - **[phenotype-shared](../phenoShared)** — Rust infrastructure toolkit (domain, application, ports)
 
+## Development & Governance
+
+**AgilePlus Tracking**: All work tracked in `/repos/AgilePlus`. Review `CLAUDE.md` for development contracts and policies.
+
+**Quality Gates**:
+```bash
+cargo build --release --workspace      # Full release build
+cargo test --workspace                 # Complete test suite
+cargo clippy --workspace -- -D warnings # Zero warnings required
+cargo fmt --check                      # Format validation
+```
+
+**Crate Publishing**: Each sub-crate published independently to crates.io with `sidekick-*` prefix. Version metadata in root `Cargo.toml`.
+
+**Cross-Collection Integration**: Sidekick integrates with phenotype-bus for async event streaming. Other collections (Stashly, Observably, Eidolon) consume dispatch events for specialized handling.
+
+## Related Phenotype Collections
+
+- **[Eidolon](../Eidolon)** — Device automation & virtualization
+- **[Observably](../Observably)** — Distributed tracing & observability
+- **[Stashly](../Stashly)** — State, events, caching, persistence
+- **[Paginary](../Paginary)** — Knowledge collection
+- **[phenotype-shared](../phenotype-shared)** — Shared infrastructure
+
 ## License
 
 Apache 2.0
+
+**Status**: Active development (Phase 2 in progress)  
+**Collections Showcase**: https://dev.phenotype.io/collections  
+**Last Updated**: 2026-04-24
