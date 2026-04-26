@@ -142,7 +142,7 @@ cargo fmt --check                      # Format validation
 
 ## License
 
-Apache 2.0
+MIT — see [LICENSE](./LICENSE).
 
 **Status**: Active development (Phase 2 in progress)  
 **Collections Showcase**: https://dev.phenotype.io/collections  
