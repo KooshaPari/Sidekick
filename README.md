@@ -2,19 +2,34 @@
 
 ![Sidekick Logo](assets/logo-placeholder.svg)
 
-**Sidekick collection** — Agent micro-utilities for Phenotype org. 5 members, 3 canonical.
+**Sidekick collection** — Agent micro-utilities for Phenotype org. 3 canonical members, all at gold-standard FR coverage.
 
 A named Rust workspace consolidating core agent infrastructure utilities for the Phenotype ecosystem.
 
 ## Members
 
-| Name | Repository | Status | FR Prefix | Purpose |
-|------|-----------|--------|-----------|---------|
-| **agent-imessage** | [agent-imessage](../agent-imessage) | CANONICAL | FR-MSG | iMessage/SMS messaging bridge (MCP server) |
-| **agent-user-status** | [agent-user-status](../agent-user-status) | CANONICAL | FR-USR | User presence & status tracking (MCP server) |
-| **cheap-llm-mcp** | [cheap-llm-mcp](../cheap-llm-mcp) | CANONICAL | FR-LLM | Budget LLM routing (FastMCP + Python) |
-| **PhenoAgent** | [PhenoAgent](../PhenoAgent) | CANDIDATE | FR-AGN | Agent framework with skill system (W-67F) |
-| **phenotype-skills** | [phenotype-skills](../phenotype-skills) | CANDIDATE | FR-SKL | Reusable skill library (W-67F) |
+| Name | Repository | Status | FR Prefix | FR Coverage | Purpose |
+|------|-----------|--------|-----------|-------------|---------|
+| **agent-user-status** | [agent-user-status](../agent-user-status) | CANONICAL | FR-USR | 67/67 | User presence & status tracking (MCP server) |
+| **cheap-llm-mcp** | [cheap-llm-mcp](../cheap-llm-mcp) | CANONICAL | FR-LLM | 38/38 | Budget LLM routing (FastMCP + Python) |
+| **sidekick-messaging** | [Sidekick/crates/sidekick-messaging](./crates/sidekick-messaging) | CANONICAL | FR-MSG | Pending | iMessage/SMS messaging bridge adapter (Rust stub) |
+
+### Rejected Candidates
+
+| Name | Reason | Audit |
+|------|--------|-------|
+| **PhenoAgent** | <1% test coverage, 0 adopters | [W-68D audit](../docs/org-audit-2026-04/wave68_sidekick_candidates_audit.md) |
+| **phenotype-skills** | Empty stub, not ready for adoption | [W-68D audit](../docs/org-audit-2026-04/wave68_sidekick_candidates_audit.md) |
+
+## Quality Bar
+
+**Sidekick canonical standard:** All canonical members maintain 100% functional requirement traceability.
+
+- **agent-user-status**: 67 FRs, 100% traced to tests
+- **cheap-llm-mcp**: 38 FRs, 100% traced to tests
+- **sidekick-messaging**: FR scaffolding pending integration
+
+See `docs/reference/FR_TRACKER.md` for detailed coverage per member.
 
 ## Quick Start
 
@@ -26,10 +41,10 @@ cargo test --workspace
 
 ## Integration Map
 
-- **agent-imessage** — MCP tools: `tool_send_message`, `tool_get_recent_messages`, `tool_fuzzy_search_messages`
-- **agent-user-status** — MCP tools: `user_status`, `record_presence_signal`, `set_user_status`
+- **agent-user-status** — MCP tools: `user_status`, `record_presence_signal`, `set_user_status`, eye-tracking, presence signals
 - **cheap-llm-mcp** — Skill routing for low-cost LLM completions (Minimax, Kimi, Fireworks)
-- **PhenoAgent** — Foundational agent framework; integrates cheap-llm-mcp + agent-imessage + agent-user-status
+- **sidekick-messaging** — Unified messaging adapter (stub); wraps iMessage, SMS, email via agent-imessage skill
+- **PhenoAgent** — Foundational agent framework; integrates cheap-llm-mcp + agent-user-status + sidekick-messaging
 - **phenotype-skills** — Shared skill definitions consumed by PhenoAgent and external agents
 
 ## Architecture
