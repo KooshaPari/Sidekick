@@ -36,6 +36,8 @@ agileplus status <id> --wp <wp> --state <state>
 | `sidekick-cheap-llm` | cheap-llm-mcp | Budget LLM routing (FastMCP + Python) |
 | `sidekick-messaging` | TBD (agent-imessage) | Multi-provider messaging (deferred) |
 
+**FYI:** agent-user-status is a Sidekick-canonical peer of agent-imessage (both MCP servers for agent infrastructure). Both repos maintain independent FR traceability and test coverage under Sidekick governance.
+
 ## Workspace Conventions
 
 - Each crate stands alone; no inter-crate dependencies by design
