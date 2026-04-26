@@ -2,14 +2,19 @@
 
 ![Sidekick Logo](assets/logo-placeholder.svg)
 
+**Sidekick collection** — Agent micro-utilities for Phenotype org. 5 members, 3 canonical.
+
 A named Rust workspace consolidating core agent infrastructure utilities for the Phenotype ecosystem.
 
-## Components
+## Members
 
-- **sidekick-presence** — Agent presence and user-status tracking (online/away/focus modes)
-- **sidekick-dispatch** — Multi-provider dispatch routing for heterogeneous agent fleets
-- **sidekick-cheap-llm** — Budget-conscious LLM routing (Minimax, Kimi, Fireworks) via FastMCP
-- **sidekick-messaging** — Forthcoming: multi-provider messaging integration (iMessage, SMS, RCS)
+| Name | Repository | Status | FR Prefix | Purpose |
+|------|-----------|--------|-----------|---------|
+| **agent-imessage** | [agent-imessage](../agent-imessage) | CANONICAL | FR-MSG | iMessage/SMS messaging bridge (MCP server) |
+| **agent-user-status** | [agent-user-status](../agent-user-status) | CANONICAL | FR-USR | User presence & status tracking (MCP server) |
+| **cheap-llm-mcp** | [cheap-llm-mcp](../cheap-llm-mcp) | CANONICAL | FR-LLM | Budget LLM routing (FastMCP + Python) |
+| **PhenoAgent** | [PhenoAgent](../PhenoAgent) | CANDIDATE | FR-AGN | Agent framework with skill system (W-67F) |
+| **phenotype-skills** | [phenotype-skills](../phenotype-skills) | CANDIDATE | FR-SKL | Reusable skill library (W-67F) |
 
 ## Quick Start
 
@@ -18,6 +23,14 @@ cd /Users/kooshapari/CodeProjects/Phenotype/repos/Sidekick
 cargo build --release
 cargo test --workspace
 ```
+
+## Integration Map
+
+- **agent-imessage** — MCP tools: `tool_send_message`, `tool_get_recent_messages`, `tool_fuzzy_search_messages`
+- **agent-user-status** — MCP tools: `user_status`, `record_presence_signal`, `set_user_status`
+- **cheap-llm-mcp** — Skill routing for low-cost LLM completions (Minimax, Kimi, Fireworks)
+- **PhenoAgent** — Foundational agent framework; integrates cheap-llm-mcp + agent-imessage + agent-user-status
+- **phenotype-skills** — Shared skill definitions consumed by PhenoAgent and external agents
 
 ## Architecture
 
