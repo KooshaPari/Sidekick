@@ -153,11 +153,15 @@ Sidekick integrates with the Phenotype ecosystem via **phenotype-bus**:
 - **Emits**: `DispatchStarted`, `DispatchCompleted`, `StatusChanged` events
 - **Receives**: Status checks from Eidolon (automation triggers dispatch), Observably (traces dispatch decisions)
 
-See [phenotype-bus](../../phenotype-bus/README.md) for event bus patterns. Sidekick works seamlessly with [Eidolon](../Eidolon/README.md) (device automation triggered by dispatch), [Observably](../Observably/README.md) (traces all dispatch routing), and [Stashly](../Stashly/README.md) (caches dispatch results).
+See [phenotype-bus](../../phenotype-bus/README.md) for event bus patterns. Sidekick works
+seamlessly with [Eidolon](../../Eidolon/README.md) (device automation triggered by dispatch),
+[Observably](../../PhenoObservability/README.md) (traces all dispatch routing), and
+[Stashly](../../Stashly/README.md) (caches dispatch results).
 
 ## Next Steps
 
-- Read the [sidekick-dispatch architecture](./docs/DISPATCH_ROUTING.md)
-- Explore [sidekick-presence lifecycle management](./docs/PRESENCE_LIFECYCLE.md)
-- See [cheap-llm MCP patterns](./crates/sidekick-cheap-llm/README.md)
-- Check the [cross-collection demo](../../docs/collections/cross_collection_demo.md)
+- Review the routing and presence examples in this guide.
+- Read the [dispatch-worker routing pattern](../../docs/governance/dispatch_routing_pattern_2026_04_27.md).
+- See [cheap-llm MCP patterns](../crates/sidekick-cheap-llm/README.md).
+- Try the [cross-collection demo](../crates/sidekick-dispatch/examples/cross_collection_demo.rs).
+- Check [docs/FUNCTIONAL_REQUIREMENTS.md](FUNCTIONAL_REQUIREMENTS.md) for requirement coverage.
