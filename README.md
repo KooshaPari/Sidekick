@@ -22,8 +22,8 @@ A named Rust workspace consolidating core agent infrastructure utilities for the
 
 | Name | Reason | Audit |
 |------|--------|-------|
-| **PhenoAgent** | <1% test coverage, 0 adopters | [W-68D audit](../docs/org-audit-2026-04/wave68_sidekick_candidates_audit.md) |
-| **phenotype-skills** | Empty stub, not ready for adoption | [W-68D audit](../docs/org-audit-2026-04/wave68_sidekick_candidates_audit.md) |
+| **PhenoAgent** | <1% test coverage, 0 adopters | [W-68D audit](../phenotype-org-audits/audits/2026-04-24/collection_build_matrix.md) |
+| **phenotype-skills** | Empty stub, not ready for adoption | [W-68D audit](../phenotype-org-audits/audits/2026-04-24/collection_build_matrix.md) |
 
 ## Quality Bar
 
@@ -33,7 +33,8 @@ A named Rust workspace consolidating core agent infrastructure utilities for the
 - **cheap-llm-mcp**: 38 FRs, 100% traced to tests
 - **sidekick-messaging**: FR scaffolding pending integration
 
-See `docs/reference/FR_TRACKER.md` for detailed coverage per member.
+See [docs/FUNCTIONAL_REQUIREMENTS.md](docs/FUNCTIONAL_REQUIREMENTS.md) for the current
+functional requirement inventory.
 
 ## Quick Start
 
@@ -103,7 +104,9 @@ while let Ok(event) = rx.recv().await {
 }
 ```
 
-See `../../phenotype-bus/README.md` and `docs/org-audit-2026-04/collection_build_matrix.md` for integration details.
+See [phenotype-bus](../phenotype-bus/README.md) and the
+[collection build matrix](../phenotype-org-audits/audits/2026-04-24/collection_build_matrix.md)
+for integration details.
 
 ## Publishing
 
@@ -139,10 +142,10 @@ cargo fmt --check                      # Format validation
 ## Related Phenotype Collections
 
 - **[Eidolon](../Eidolon)** — Device automation & virtualization
-- **[Observably](../Observably)** — Distributed tracing & observability
+- **[Observably](../PhenoObservability)** — Distributed tracing & observability
 - **[Stashly](../Stashly)** — State, events, caching, persistence
 - **[Paginary](../Paginary)** — Knowledge collection
-- **[phenotype-shared](../phenotype-shared)** — Shared infrastructure
+- **[phenotype-shared](../phenoShared)** — Shared infrastructure
 
 ## License
 
