@@ -5,6 +5,7 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Rust](https://img.shields.io/badge/rust-1.83+-orange.svg?logo=rust&logoColor=white)](Cargo.toml)
 [![Status](https://img.shields.io/badge/status-active-brightgreen.svg)](#)
+[![AI Slop Inside](https://sladge.net/badge.svg)](https://sladge.net)
 
 **Sidekick collection** — Agent micro-utilities for Phenotype org. 3 canonical members, all at gold-standard FR coverage.
 
