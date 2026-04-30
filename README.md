@@ -5,7 +5,6 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Rust](https://img.shields.io/badge/rust-1.83+-orange.svg?logo=rust&logoColor=white)](Cargo.toml)
 [![Status](https://img.shields.io/badge/status-active-brightgreen.svg)](#)
-[![AI Slop Inside](https://sladge.net/badge.svg)](https://sladge.net)
 
 **Sidekick collection** — Agent micro-utilities for Phenotype org. 3 canonical members, all at gold-standard FR coverage.
 
@@ -23,8 +22,8 @@ A named Rust workspace consolidating core agent infrastructure utilities for the
 
 | Name | Reason | Audit |
 |------|--------|-------|
-| **PhenoAgent** | <1% test coverage, 0 adopters | [W-68D audit](../phenotype-org-audits/audits/2026-04-24/collection_build_matrix.md) |
-| **phenotype-skills** | Empty stub, not ready for adoption | [W-68D audit](../phenotype-org-audits/audits/2026-04-24/collection_build_matrix.md) |
+| **PhenoAgent** | <1% test coverage, 0 adopters | [W-68D audit](../docs/org-audit-2026-04/wave68_sidekick_candidates_audit.md) |
+| **phenotype-skills** | Empty stub, not ready for adoption | [W-68D audit](../docs/org-audit-2026-04/wave68_sidekick_candidates_audit.md) |
 
 ## Quality Bar
 
@@ -104,7 +103,7 @@ while let Ok(event) = rx.recv().await {
 }
 ```
 
-See `../../phenotype-bus/README.md` and `../phenotype-org-audits/audits/2026-04-24/collection_build_matrix.md` for integration details.
+See `../../phenotype-bus/README.md` and `docs/org-audit-2026-04/collection_build_matrix.md` for integration details.
 
 ## Publishing
 
