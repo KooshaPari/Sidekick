@@ -5,3 +5,4 @@ crates/sidekick-presence/
 /target
 target/
 Cargo.lock
+Cargo.lock
