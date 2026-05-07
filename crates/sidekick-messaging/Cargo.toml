@@ -13,4 +13,9 @@ thiserror = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
 phenotype-errors = { workspace = true }
-phenotype-bus = { path = "../../../phenotype-bus" }
+tracing = { workspace = true }
+uuid = { workspace = true }
+chrono = { workspace = true }
+
+[dev-dependencies]
+tracing-subscriber = { workspace = true }
