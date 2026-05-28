@@ -1,4 +1,7 @@
 name: cargo-semver-checks
+
+permissions: read-all
+
 on:
   pull_request: { paths: ['**/Cargo.toml'] }
   workflow_dispatch:

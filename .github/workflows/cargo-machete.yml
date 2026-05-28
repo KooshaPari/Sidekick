@@ -1,4 +1,7 @@
 name: cargo-machete
+
+permissions: read-all
+
 on:
   push: { branches: [main], paths: ['Cargo.toml', '**/Cargo.toml'] }
   pull_request: { paths: ['Cargo.toml', '**/Cargo.toml'] }
