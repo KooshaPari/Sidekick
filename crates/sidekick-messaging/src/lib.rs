@@ -39,7 +39,11 @@ pub struct Message {
 
 impl Message {
     /// Create a new message.
-    pub fn new(recipient: impl Into<String>, body: impl Into<String>, provider: MessageProvider) -> Self {
+    pub fn new(
+        recipient: impl Into<String>,
+        body: impl Into<String>,
+        provider: MessageProvider,
+    ) -> Self {
         Self {
             recipient: recipient.into(),
             body: body.into(),
