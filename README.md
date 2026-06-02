@@ -1,3 +1,8 @@
+> **Work state:** ACTIVE · **Progress:** `█████░░░░░ 50%`
+> Phenotype-org agent presence · updated 2026-06-02
+
+---
+
 > **Pinned references (Phenotype-org)**
 > - MSRV: see rust-toolchain.toml
 > - cargo-deny config: see deny.toml
