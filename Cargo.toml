@@ -1,6 +1,5 @@
 [workspace]
 members = [
-    "crates/sidekick-dispatch",
     "crates/sidekick-messaging",
   ]
 resolver = "2"
