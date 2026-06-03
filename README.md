@@ -1,3 +1,6 @@
+> **Work state:** SCAFFOLD · **Progress:** `██░░░░░░░░ 20%`
+> Agent presence; only sidekick-messaging, awaiting agent-imessage · updated 2026-06-02
+
 > **Pinned references (Phenotype-org)**
 > - MSRV: see rust-toolchain.toml
 > - cargo-deny config: see deny.toml
