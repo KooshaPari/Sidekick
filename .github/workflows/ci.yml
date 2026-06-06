@@ -5,10 +5,10 @@ permissions: read-all
 on: [push, pull_request]
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: dtolnay/rust-toolchain@29eef336d9b2848a0b548edc03f92a220660cdb8
       - uses: Swatinem/rust-cache@v2
       - run: cargo test --all-features --workspace
       - run: cargo clippy --all-features -- -D warnings 2>/dev/null || cargo check
