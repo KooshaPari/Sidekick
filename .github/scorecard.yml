@@ -1,0 +1,15 @@
+# OpenSSF Scorecard configuration
+# https://github.com/ossf/scorecard
+checks:
+  Branch-Protection:
+    enabled: true
+  Code-Review:
+    enabled: true
+  Dangerous-Workflow:
+    enabled: true
+  Dependency-Update-Tool:
+    enabled: true
+  Pinned-Dependencies:
+    enabled: true
+  Token-Permissions:
+    enabled: true
