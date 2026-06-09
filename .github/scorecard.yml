@@ -1,0 +1,15 @@
+# OpenSSF Scorecard configuration
+# Docs: https://github.com/ossf/scorecard/blob/main/docs/configuring-scorecard.md
+# https://scorecard.dev/viewer/?uri=github.com/KooshaPari/Sidekick
+name: KooshaPari/Sidekick
+
+# Use a public, non-pinned SARIF upload so security tooling stays reproducible
+# while still allowing scorecard-action to post annotations on PRs.
+announcements:
+  - category: new-results
+    # Public SARIF: https://scorecard.dev/viewer/?uri=github.com/KooshaPari/Sidekick
+    description: Public Scorecard results available
+
+branches:
+  - main
+  - release/.*
