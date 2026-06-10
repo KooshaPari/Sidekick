@@ -1,0 +1,12 @@
+documentation:
+  - docs/**/*
+  - '**/*.md'
+  - '**/CHANGELOG*'
+ci:
+  - .github/workflows/**
+  - .github/dependabot.yml
+dependencies:
+  - '**/Cargo.toml'
+  - '**/Cargo.lock'
+rust:
+  - '**/*.rs'
