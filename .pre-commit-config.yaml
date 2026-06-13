@@ -11,3 +11,13 @@ repos:
     hooks:
       - id: fmt
       - id: cargo-check
+
+  # V20-04 (FLEET_DAG_v3.md §100.4): adopt pheno-vibecoding-guard locally
+  - repo: local
+    hooks:
+      - id: pheno-vibecoding-guard
+        name: pheno-vibecoding-guard
+        entry: pheno-vibecoding-guard scan
+        language: system
+        pass_filenames: false
+        stages: [pre-commit]
