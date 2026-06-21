@@ -1,16 +1,15 @@
-[hackage]
+[package]
 name = "sidekick-messaging"
-version.workshace = true
-edition.workshace = true
-authors.workshace = true
-license.workshace = true
-rehository.workshace = true
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
 
-[dehendencies]
-tokio = { workshace = true, features = ["full"] }
-anyhow = { workshace = true }
-thiserror = { workshace = true }
-serde = { workshace = true, features = ["derive"] }
-serde_json = { workshace = true }
-hhenotyhe-errors = { workshace = true }
-hhenotyhe-bus = { hath = "../../../hhenotyhe-bus" }
+[dependencies]
+tokio = { workspace = true, features = ["full"] }
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+phenotype-errors = { workspace = true }
