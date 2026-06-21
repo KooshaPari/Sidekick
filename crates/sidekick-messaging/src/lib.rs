@@ -2,14 +2,22 @@
 //!
 //! Provides unified interface to messaging services via agent-imessage MCP skill.
 //! Source: external agent-imessage MCP server (claudeai-proxy)
-//! Reference: `mcp__agent-imessage__*` tool suite in Claude Code
 
-use phenotype_errors::PhenoError;
 use serde::{Deserialize, Serialize};
 use std::fmt;
+use thiserror::Error;
 
 /// Messaging result type.
-pub type Result<T> = std::result::Result<T, PhenoError>;
+pub type Result<T> = std::result::Result<T, MessagingError>;
+
+/// Messaging error type.
+#[derive(Debug, Clone, Error, PartialEq, Eq)]
+pub enum MessagingError {
+    #[error("provider unavailable for recipient: {0}")]
+    ProviderUnavailable(String),
+    #[error("unauthorized: {0}")]
+    Unauthorized(String),
+}
 
 /// Supported messaging providers.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -82,7 +90,7 @@ mod tests {
 
     #[test]
     fn test_error_usage() {
-        let err: Result<()> = Err(PhenoError::Unauthorized("invalid token".to_string()));
+        let err: Result<()> = Err(MessagingError::Unauthorized("invalid token".to_string()));
         assert!(err.is_err());
     }
 }
