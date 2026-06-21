@@ -106,7 +106,7 @@ Sidekick is part of the **Phenotype named collections**:
 
 ### Event Bus
 
-Sidekick uses **phenotype-bus** for cross-collection communication. Collections emit domain events that other collections consume without hardcoded dependencies:
+Sidekick uses **phenoEvents** for cross-collection communication. The historical `phenotype-bus` repository is archived; event-bus work was migrated to `KooshaPari/phenoEvents`. Collections emit domain events that other collections consume without hardcoded dependencies:
 
 ```rust
 use phenotype_bus::{Bus, Event};
@@ -132,7 +132,7 @@ while let Ok(event) = rx.recv().await {
 }
 ```
 
-See [phenotype-bus](../phenotype-bus/README.md) and the
+See [phenoEvents](../phenoEvents/README.md) and the
 [collection build matrix](../phenotype-org-audits/audits/2026-04-24/collection_build_matrix.md)
 for integration details.
 
@@ -165,7 +165,7 @@ cargo fmt --check                      # Format validation
 
 **Crate Publishing**: Each sub-crate published independently to crates.io with `sidekick-*` prefix. Version metadata in root `Cargo.toml`.
 
-**Cross-Collection Integration**: Sidekick integrates with phenotype-bus for async event streaming. Other collections (Stashly, Observably, Eidolon) consume dispatch events for specialized handling.
+**Cross-Collection Integration**: Sidekick integrates with phenoEvents for async event streaming; phenotype-bus is archived historical context only. Other collections (Stashly, Observably, Eidolon) consume dispatch events for specialized handling.
 
 ## Related Phenotype Collections
 
