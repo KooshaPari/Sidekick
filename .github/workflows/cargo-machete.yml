@@ -11,5 +11,7 @@ jobs:
   machete:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.1.1
-      - uses: bnjbvr/cargo-machete@fbb3fa76a4af23b0146dc1b1c248965a300282e8
+      - uses: actions/checkout@v4 # v4.1.1
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: taiki-e/install-action@cargo-machete
+      - run: cargo machete

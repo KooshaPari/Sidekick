@@ -9,7 +9,7 @@ Sidekick solves the foundational challenge of agent infrastructure: routing disp
 - **Multi-provider dispatch** — Route a single task to Forge, Codex, Copilot, Gemini, Cursor, or local models, with transparent failover and cost-aware selection
 - **User presence tracking** — Maintain real-time agent status (online, away, focus, inactive) synced across distributed presence services
 - **Budget LLM routing** — Use Minimax, Kimi, or Fireworks for tasks that don't need Opus/Sonnet, cutting inference costs 3-10x
-- **Cross-collection coordination** — Emit dispatch events to phenotype-bus so downstream collections (Eidolon, Observably) can react
+- **Cross-collection coordination** — Emit dispatch events to typed dispatch events so downstream collections (Eidolon, Observably) can react
 
 ## Install
 
@@ -32,7 +32,6 @@ sidekick-cheap-llm = { path = "../../sidekick/crates/sidekick-cheap-llm" }
 tokio = { version = "1", features = ["full"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-phenotype-bus = { path = "../../phenotype-bus" }
 ```
 
 ## Quickstart (20 lines)
@@ -109,7 +108,7 @@ let expensive_request = DispatchRequest::new("agent", "design architecture...")
 let result = dispatcher.dispatch(expensive_request).await?;
 ```
 
-### Pattern 3: Cross-Collection Events via phenotype-bus
+### Pattern 3: Cross-Collection Events via typed dispatch events
 
 Emit dispatch lifecycle events so other collections (Eidolon, Observably) can respond.
 
@@ -148,12 +147,12 @@ while let Ok(event) = rx.recv().await {
 
 ## Cross-Collection Integration
 
-Sidekick integrates with the Phenotype ecosystem via **phenotype-bus**:
+Sidekick integrates with the Phenotype ecosystem via **typed dispatch events**:
 
 - **Emits**: `DispatchStarted`, `DispatchCompleted`, `StatusChanged` events
 - **Receives**: Status checks from Eidolon (automation triggers dispatch), Observably (traces dispatch decisions)
 
-See [phenotype-bus](../../phenotype-bus/README.md) for event bus patterns. Sidekick works
+See [typed dispatch events](../../typed dispatch events/README.md) for event bus patterns. Sidekick works
 seamlessly with [Eidolon](../../Eidolon/README.md) (device automation triggered by dispatch),
 [Observably](../../PhenoObservability/README.md) (traces all dispatch routing), and
 [Stashly](../../Stashly/README.md) (caches dispatch results).
