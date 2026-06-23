@@ -8,7 +8,10 @@ use std::fmt;
 use thiserror::Error;
 
 /// Messaging result type.
-pub type Result<T> = std::result::Result<T, MessagingError>;
+pub type PhenoError = MessagingError;
+
+/// Messaging result type.
+pub type Result<T> = std::result::Result<T, PhenoError>;
 
 /// Messaging error type.
 #[derive(Debug, Clone, Error, PartialEq, Eq)]
