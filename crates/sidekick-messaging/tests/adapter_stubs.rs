@@ -1,9 +1,7 @@
 //! MessagingAdapter trait stubs for SIDE-FR-001 (audit remediation).
 //! Traces to: docs/specs/SPEC.md#SIDE-FR-001
 
-use sidekick_messaging::{
-    Message, MessageProvider, MessagingAdapter, MessagingError, Result,
-};
+use sidekick_messaging::{Message, MessageProvider, MessagingAdapter, MessagingError, Result};
 
 /// Stub adapter for contract testing — no network I/O.
 struct StubAdapter {
@@ -48,10 +46,7 @@ fn adapter_stub_send_fails_when_unavailable() {
     let adapter = StubAdapter::unavailable();
     let msg = Message::new("bob", "ping", MessageProvider::SMS);
     let err = adapter.send(&msg).unwrap_err();
-    assert_eq!(
-        err,
-        MessagingError::ProviderUnavailable("bob".to_string())
-    );
+    assert_eq!(err, MessagingError::ProviderUnavailable("bob".to_string()));
 }
 
 #[test]
