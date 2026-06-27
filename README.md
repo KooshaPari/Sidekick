@@ -1,3 +1,15 @@
+> Work state: docs polish in progress | Progress: ██████░░░░ 6/10
+
+Sidekick is a Phenotype workspace for agent-facing utilities, including presence/status tracking, low-cost LLM routing, and messaging adapters. It is a multi-language collection with independently versioned crates and a focus on reusable infrastructure for agent workflows.
+
+## Usage / Quickstart
+
+```bash
+cd /Users/kooshapari/CodeProjects/Phenotype/repos/Sidekick
+cargo build --release --workspace
+cargo test --workspace
+```
+
 <!-- AI-DD-META:START -->
 <!-- This repository is planned, maintained, and managed by AI Agents only. -->
 <!-- Slop issues are expected and intentionally present as part of an HITL-less -->
@@ -189,4 +201,3 @@ This repository includes the following cross-cutting documents:
 
 - [`AGENTS.md`](AGENTS.md) — operating instructions for AI agents and human contributors
 - [`docs/`](docs/) — design notes, ADRs, and supporting documentation (see [`docs/index.md`](docs/index.md))
-
