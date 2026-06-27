@@ -81,6 +81,6 @@ jobs:
           retention-days: 90
 
       - name: Attest build provenance (SLSA Build L2)
-        uses: slsa-framework/slsa-github-generator/attest-build-provenance@c747fe7769adf3656dc7d588b161cb614d7abfee
+        uses: slsa-framework/slsa-github-generator/attest-build-provenance@f7dd8c54c2067bafc12ca7a55595d5ee9b75204a
         with:
           artifact-name: release-artifacts
