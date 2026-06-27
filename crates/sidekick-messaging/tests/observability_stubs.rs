@@ -14,7 +14,10 @@ fn observability_stub_required_fields_are_documented() {
     let fields = required_span_fields();
     assert!(fields.contains(&"crate"));
     assert!(fields.contains(&"op"));
-    assert!(fields.len() >= 3, "minimum span field contract must be defined");
+    assert!(
+        fields.len() >= 3,
+        "minimum span field contract must be defined"
+    );
 }
 
 #[test]
