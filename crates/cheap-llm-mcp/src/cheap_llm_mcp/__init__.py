@@ -3,6 +3,7 @@
 from cheap_llm_mcp.cache import TTLCache
 from cheap_llm_mcp.config import Config, ProviderConfig
 from cheap_llm_mcp.config import load as load_config
+from cheap_llm_mcp.errors import CheapLMSError, ConfigError, LedgerCapExceeded, RouterError
 from cheap_llm_mcp.ledger import (
     PRICING,
     Ledger,
@@ -17,13 +18,17 @@ from cheap_llm_mcp.router import Router
 __version__ = "0.1.0"
 
 __all__ = [
-    "PRICING",
+    "CheapLMSError",
     "Config",
+    "ConfigError",
     "Ledger",
+    "LedgerCapExceeded",
     "LedgerEntry",
     "MonthAggregate",
+    "PRICING",
     "ProviderConfig",
     "Router",
+    "RouterError",
     "TTLCache",
     "estimate_cost_usd",
     "load_config",

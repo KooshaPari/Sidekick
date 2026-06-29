@@ -3,6 +3,7 @@ from __future__ import annotations
 import pytest
 
 from cheap_llm_mcp.config import Config, ProviderConfig
+from cheap_llm_mcp.errors import RouterError
 from cheap_llm_mcp.providers.base import Completion
 from cheap_llm_mcp.router import Router
 
@@ -82,5 +83,5 @@ async def test_router_auto_fallback(router: Router):
 async def test_router_all_fail(router: Router):
     router._providers["minimax"] = _FakeProvider("minimax", fail=True)
     router._providers["kimi"] = _FakeProvider("kimi", fail=True)
-    with pytest.raises(RuntimeError, match="All providers failed"):
+    with pytest.raises(RouterError):
         await router.complete("hi")

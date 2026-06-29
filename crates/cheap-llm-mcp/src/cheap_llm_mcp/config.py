@@ -5,6 +5,8 @@ import tomllib
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from .errors import ConfigError
+
 
 @dataclass
 class ProviderConfig:
@@ -20,7 +22,7 @@ class ProviderConfig:
     def api_key(self) -> str:
         key = os.environ.get(self.api_key_env)
         if not key:
-            raise RuntimeError(f"Provider {self.name!r}: env var {self.api_key_env} is not set")
+            raise ConfigError(f"Provider {self.name!r}: API key not set in environment")
         return key
 
 

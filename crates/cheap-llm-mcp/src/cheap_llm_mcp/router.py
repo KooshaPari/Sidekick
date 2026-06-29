@@ -5,6 +5,7 @@ from collections.abc import AsyncIterator
 
 from .cache import TTLCache
 from .config import Config
+from .errors import RouterError
 from .providers import Completion, Message, OpenAICompatProvider
 
 log = logging.getLogger(__name__)
@@ -85,7 +86,7 @@ class Router:
             except Exception as e:
                 log.warning("provider %s failed: %s", name, e)
                 last_error = e
-        raise RuntimeError(f"All providers failed; last: {last_error!r}")
+        raise RouterError("All providers failed")
 
     async def stream(
         self,

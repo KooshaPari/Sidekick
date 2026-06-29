@@ -3,11 +3,13 @@ from __future__ import annotations
 import asyncio
 import logging
 from pathlib import Path
+from threading import Lock
 from typing import Literal
 
 from fastmcp import FastMCP
 
 from .config import load as load_config
+from .errors import CheapLMSError
 from .ledger import Ledger
 from .logging_util import request_scope, setup_json_logging
 from .router import Router
@@ -17,24 +19,32 @@ log = logging.getLogger("cheap-llm-mcp")
 mcp = FastMCP("cheap-llm")
 _router: Router | None = None
 _ledger: Ledger | None = None
+_router_lock = Lock()
+_ledger_lock = Lock()
 
 
 def _router_get() -> Router:
     global _router
     if _router is None:
-        cfg = load_config()
-        _router = Router(cfg, cache_ttl=cfg.cache_ttl_seconds)
+        with _router_lock:
+            # Double-check after acquiring lock
+            if _router is None:
+                cfg = load_config()
+                _router = Router(cfg, cache_ttl=cfg.cache_ttl_seconds)
     return _router
 
 
 def _ledger_get() -> Ledger:
     global _ledger
     if _ledger is None:
-        cfg = _router_get().cfg
-        _ledger = Ledger(
-            path=Path.home() / ".cheap-llm" / "ledger.jsonl",
-            cap_usd=cfg.monthly_cost_cap_usd,
-        )
+        with _ledger_lock:
+            # Double-check after acquiring lock
+            if _ledger is None:
+                cfg = _router_get().cfg
+                _ledger = Ledger(
+                    path=Path.home() / ".cheap-llm" / "ledger.jsonl",
+                    cap_usd=cfg.monthly_cost_cap_usd,
+                )
     return _ledger
 
 

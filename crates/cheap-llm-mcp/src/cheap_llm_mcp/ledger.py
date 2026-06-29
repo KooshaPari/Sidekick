@@ -6,6 +6,8 @@ from dataclasses import asdict, dataclass, field
 from datetime import UTC, date, datetime
 from pathlib import Path
 
+from .errors import LedgerCapExceeded
+
 # Rough USD-per-1M-token pricing snapshot (input, output). Update as needed.
 # Sourced from each provider's public pricing pages; treat as ceiling.
 PRICING: dict[str, tuple[float, float]] = {
@@ -87,12 +89,12 @@ class Ledger:
         return agg
 
     def check_cap(self) -> None:
-        """Raise RuntimeError if monthly cap is exceeded."""
+        """Raise LedgerCapExceeded if monthly cap is exceeded."""
         if self.cap_usd is None:
             return
         agg = self.month_total()
         if agg.total_usd >= self.cap_usd:
-            raise RuntimeError(
-                f"cheap-llm monthly cap ${self.cap_usd:.2f} reached "
+            raise LedgerCapExceeded(
+                f"Monthly cap ${self.cap_usd:.2f} reached "
                 f"(spent ${agg.total_usd:.2f} across {agg.calls} calls)"
             )

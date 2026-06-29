@@ -2,7 +2,8 @@ from __future__ import annotations
 
 import pytest
 
-from cheap_llm_mcp.config import load
+from cheap_llm_mcp.config import Config, ProviderConfig, load
+from cheap_llm_mcp.errors import ConfigError
 
 
 @pytest.mark.requirement("FR-LLM-011")
@@ -58,3 +59,19 @@ def test_load_valid_file(tmp_path):
     assert cfg.default_provider == "minimax"
     assert cfg.monthly_cost_cap_usd == 25.0
     assert cfg.providers["minimax"].default_model == "MiniMax-M2.7"
+
+
+@pytest.mark.requirement("FR-LLM-015")
+def test_config_error_when_api_key_missing():
+    cfg = Config(
+        providers={
+            "test": ProviderConfig(
+                name="test",
+                base_url="http://localhost",
+                api_key_env="MISSING_ENV_VAR",
+                default_model="test-model",
+            ),
+        },
+    )
+    with pytest.raises(ConfigError, match="API key not set"):
+        _ = cfg.providers["test"].api_key

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import pytest
 
+from cheap_llm_mcp.errors import LedgerCapExceeded
 from cheap_llm_mcp.ledger import Ledger, estimate_cost_usd
 
 
@@ -32,7 +33,7 @@ def test_ledger_record_and_aggregate(tmp_path):
 def test_ledger_cap_enforcement(tmp_path):
     ledger = Ledger(path=tmp_path / "ledger.jsonl", cap_usd=0.000001)
     ledger.record("minimax", "MiniMax-M2", 1_000_000, 1_000_000)
-    with pytest.raises(RuntimeError, match="monthly cap"):
+    with pytest.raises(LedgerCapExceeded, match="Monthly cap"):
         ledger.check_cap()
 
 
