@@ -6,12 +6,15 @@ import respx
 
 from cheap_llm_mcp.config import ProviderConfig
 from cheap_llm_mcp.providers.base import Message
-from cheap_llm_mcp.providers.openai_compat import OpenAICompatProvider
+from cheap_llm_mcp.providers.openai_compat import (
+    OpenAICompatProvider,
+    _sanitize_provider_error,
+)
 
 
 @pytest.fixture
 def cfg(monkeypatch):
-    monkeypatch.setenv("TEST_API_KEY", "fake")
+    monkeypatch.setenv("TEST_API_KEY", "sk-fake-test-key")  # >=8 chars
     return ProviderConfig(
         name="test",
         base_url="https://api.example.com/v1",
@@ -134,3 +137,31 @@ async def test_health_error(cfg):
     # Note: health() swallows to return error dict.
     assert out["status"] == "error"
     await p.aclose()
+
+
+@pytest.mark.requirement("FR-LLM-060")
+def test_sanitize_provider_error_leak():
+    """_sanitize_provider_error must not leak credential-like content."""
+    exc = RuntimeError("invalid api_key: sk-abc123token")
+    safe = _sanitize_provider_error(exc)
+    assert "sk-abc123token" not in safe
+    assert "redacted" in safe
+
+
+@pytest.mark.requirement("FR-LLM-061")
+def test_sanitize_provider_error_http_status():
+    """HTTPStatusError with a response should yield a clean status label."""
+    resp = httpx.Response(401, request=httpx.Request("GET", "https://example.com"))
+    exc = httpx.HTTPStatusError("unauthorized", request=resp.request, response=resp)
+    safe = _sanitize_provider_error(exc)
+    assert "401" in safe
+    assert "HTTPStatusError" in safe
+
+
+@pytest.mark.requirement("FR-LLM-062")
+def test_sanitize_provider_error_truncated():
+    """Very long error messages should be truncated."""
+    long_msg = "x" * 500
+    exc = RuntimeError(long_msg)
+    safe = _sanitize_provider_error(exc)
+    assert len(safe) < 300

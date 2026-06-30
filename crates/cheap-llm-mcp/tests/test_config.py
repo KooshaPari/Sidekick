@@ -2,7 +2,32 @@ from __future__ import annotations
 
 import pytest
 
-from cheap_llm_mcp.config import load
+from cheap_llm_mcp.config import ProviderConfig, load
+
+
+@pytest.mark.requirement("FR-LLM-041")
+def test_provider_config_api_key_short(monkeypatch):
+    monkeypatch.setenv("TEST_KEY", "short")
+    cfg = ProviderConfig(
+        name="test",
+        base_url="http://localhost",
+        api_key_env="TEST_KEY",
+        default_model="m",
+    )
+    with pytest.raises(RuntimeError, match="too short"):
+        _ = cfg.api_key
+
+
+@pytest.mark.requirement("FR-LLM-042")
+def test_provider_config_api_key_valid(monkeypatch):
+    monkeypatch.setenv("TEST_KEY", "sk-valid-key-12345")
+    cfg = ProviderConfig(
+        name="test",
+        base_url="http://localhost",
+        api_key_env="TEST_KEY",
+        default_model="m",
+    )
+    assert cfg.api_key == "sk-valid-key-12345"
 
 
 @pytest.mark.requirement("FR-LLM-011")

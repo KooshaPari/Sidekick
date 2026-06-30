@@ -11,7 +11,7 @@ from cheap_llm_mcp.providers.openai_compat import OpenAICompatProvider
 
 @pytest.fixture
 def cfg(monkeypatch):
-    monkeypatch.setenv("TEST_API_KEY", "fake")
+    monkeypatch.setenv("TEST_API_KEY", "sk-fake-test-key")  # >=8 chars
     return ProviderConfig(
         name="test",
         base_url="https://api.example.com/v1",

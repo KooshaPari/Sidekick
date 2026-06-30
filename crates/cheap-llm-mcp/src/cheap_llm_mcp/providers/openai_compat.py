@@ -10,6 +10,34 @@ from ..retry import with_retry
 from .base import Completion, Message
 
 
+def _sanitize_provider_error(exc: Exception) -> str:
+    """Return a safe error label without leaking credentials.
+
+    Strips any lines from the exception message that look like they
+    contain API keys, tokens, or secrets.
+    """
+    type_name = type(exc).__name__
+    msg = str(exc)
+    # HTTP responses may contain upstream error bodies with credentials
+    if hasattr(exc, "response"):
+        try:
+            status = exc.response.status_code  # type: ignore[union-attr]
+            return f"HTTP {status} ({type_name})"
+        except Exception:
+            pass
+    if len(msg) > 200:
+        msg = msg[:197] + "..."
+    lines = msg.split("\n")
+    clean: list[str] = []
+    for line in lines:
+        low = line.lower()
+        if any(kw in low for kw in ("api_key", "api-key", "apikey", "bearer ", "secret", "token")):
+            clean.append(f"[{type_name}: redacted]")
+        else:
+            clean.append(line)
+    return f"{type_name}: {'; '.join(clean)}"
+
+
 class OpenAICompatProvider:
     """OpenAI-compatible chat-completions client shared by Minimax, Kimi, Fireworks."""
 
@@ -119,11 +147,12 @@ class OpenAICompatProvider:
                 "provider": self.name,
             }
         except Exception as e:
+            safe = _sanitize_provider_error(e)
             return {
                 "status": "error",
                 "latency_ms": round((time.perf_counter() - t0) * 1000, 1),
                 "provider": self.name,
-                "error": f"{type(e).__name__}: {e}",
+                "error": safe,
             }
 
     async def aclose(self) -> None:

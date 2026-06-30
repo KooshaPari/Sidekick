@@ -4,7 +4,7 @@ import pytest
 
 from cheap_llm_mcp.config import Config, ProviderConfig
 from cheap_llm_mcp.providers.base import Completion
-from cheap_llm_mcp.router import Router
+from cheap_llm_mcp.router import Router, RouterError
 
 
 class _FakeProvider:
@@ -82,5 +82,30 @@ async def test_router_auto_fallback(router: Router):
 async def test_router_all_fail(router: Router):
     router._providers["minimax"] = _FakeProvider("minimax", fail=True)
     router._providers["kimi"] = _FakeProvider("kimi", fail=True)
-    with pytest.raises(RuntimeError, match="All providers failed"):
+    with pytest.raises(RouterError, match="All providers failed"):
         await router.complete("hi")
+
+
+@pytest.mark.asyncio
+@pytest.mark.requirement("FR-LLM-005")
+async def test_router_error_preserves_cause(router: Router):
+    router._providers["minimax"] = _FakeProvider("minimax", fail=True)
+    router._providers["kimi"] = _FakeProvider("kimi", fail=True)
+    with pytest.raises(RouterError) as exc_info:
+        await router.complete("hi")
+    cause = exc_info.value.cause
+    assert cause is not None
+    assert "minimax" in str(cause) or "kimi" in str(cause)
+
+
+@pytest.mark.asyncio
+@pytest.mark.requirement("FR-LLM-006")
+async def test_router_error_sanitized(router: Router):
+    """Verify error message does not leak raw exception repr."""
+    router._providers["minimax"] = _FakeProvider("minimax", fail=True)
+    router._providers["kimi"] = _FakeProvider("kimi", fail=True)
+    with pytest.raises(RouterError) as exc_info:
+        await router.complete("hi")
+    msg = str(exc_info.value)
+    # Should not contain the raw repr of the inner error
+    assert "RuntimeError" not in msg or "boom" not in msg

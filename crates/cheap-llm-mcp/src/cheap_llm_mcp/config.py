@@ -1,9 +1,17 @@
 from __future__ import annotations
 
 import os
+import re
 import tomllib
 from dataclasses import dataclass, field
 from pathlib import Path
+
+
+# Minimum length for a plausible API key — catches env vars that are
+# accidentally set to placeholder values like "sk-your-key" stubs.
+_MIN_API_KEY_LENGTH = 8
+# Only allow characters commonly found in API keys.
+_API_KEY_PATTERN = re.compile(r"^[A-Za-z0-9_\-.:]+$")
 
 
 @dataclass
@@ -21,6 +29,17 @@ class ProviderConfig:
         key = os.environ.get(self.api_key_env)
         if not key:
             raise RuntimeError(f"Provider {self.name!r}: env var {self.api_key_env} is not set")
+        key = key.strip()
+        if len(key) < _MIN_API_KEY_LENGTH:
+            raise RuntimeError(
+                f"Provider {self.name!r}: env var {self.api_key_env} is too short "
+                f"({len(key)} chars, expected >= {_MIN_API_KEY_LENGTH})"
+            )
+        if not _API_KEY_PATTERN.match(key):
+            raise RuntimeError(
+                f"Provider {self.name!r}: env var {self.api_key_env} contains "
+                f"invalid characters (only A-Z, a-z, 0-9, -, _, ., : allowed)"
+            )
         return key
 
 

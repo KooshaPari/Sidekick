@@ -10,6 +10,51 @@ from .providers import Completion, Message, OpenAICompatProvider
 log = logging.getLogger(__name__)
 
 
+class RouterError(Exception):
+    """Typed exception for router-level failures.
+
+    Wraps the underlying provider error with a safe message that does not
+    leak internal exception details to callers.
+    """
+
+    def __init__(self, message: str, *, cause: Exception | None = None) -> None:
+        super().__init__(message)
+        self._cause = cause
+
+    @property
+    def cause(self) -> Exception | None:
+        return self._cause
+
+
+def _sanitize_exception(exc: Exception) -> str:
+    """Return a safe error label without leaking internal details.
+
+    Strips the message body from HTTP errors that may contain upstream
+    provider response text with credentials, and truncates long messages.
+    """
+    type_name = type(exc).__name__
+    msg = str(exc)
+    # HTTP status errors leak upstream response body which may include keys
+    if hasattr(exc, "response"):
+        try:
+            status = exc.response.status_code  # type: ignore[union-attr]
+            return f"HTTP {status} ({type_name})"
+        except Exception:
+            pass
+    if len(msg) > 120:
+        msg = msg[:117] + "..."
+    # Strip any lines that look like auth tokens or keys
+    lines = msg.split("\n")
+    clean: list[str] = []
+    for line in lines:
+        low = line.lower()
+        if any(kw in low for kw in ("api_key", "api-key", "apikey", "bearer ", "secret", "token")):
+            clean.append(f"[{type_name}: redacted sensitive field]")
+        else:
+            clean.append(line)
+    return "\n".join(clean)
+
+
 class Router:
     """Dispatches completion requests to the right provider with fallback."""
 
@@ -83,9 +128,13 @@ class Router:
                     self._cache.set(cache_key, result)
                 return result
             except Exception as e:
-                log.warning("provider %s failed: %s", name, e)
+                safe_msg = _sanitize_exception(e)
+                log.warning("provider %s failed: %s", name, safe_msg)
                 last_error = e
-        raise RuntimeError(f"All providers failed; last: {last_error!r}")
+        raise RouterError(
+            f"All providers failed after {len(order)} attempt(s)",
+            cause=last_error,
+        )
 
     async def stream(
         self,

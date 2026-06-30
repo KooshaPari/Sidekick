@@ -23,6 +23,10 @@ def estimate_cost_usd(model: str, input_tokens: int, output_tokens: int) -> floa
     return (input_tokens * in_rate + output_tokens * out_rate) / 1_000_000
 
 
+class LedgerCapError(Exception):
+    """Raised when a monthly cost cap is exceeded."""
+
+
 @dataclass
 class LedgerEntry:
     ts: str
@@ -42,7 +46,11 @@ class MonthAggregate:
 
 
 class Ledger:
-    """Append-only JSONL ledger with monthly cap enforcement."""
+    """Append-only JSONL ledger with monthly cap enforcement.
+
+    Thread-safe: both *record()* and *check_cap()* serialise through an
+    internal lock so that the cap check and append happen atomically.
+    """
 
     def __init__(self, path: Path, cap_usd: float | None = None):
         self.path = path
@@ -61,11 +69,28 @@ class Ledger:
             output_tokens=output_tokens,
             cost_usd=round(estimate_cost_usd(model, input_tokens, output_tokens), 6),
         )
-        with self._lock, self.path.open("a") as f:
-            f.write(json.dumps(asdict(entry)) + "\n")
+        with self._lock:
+            # Atomic cap check under the same lock as the write.
+            # This prevents TOCTOU races where concurrent requests both
+            # pass check_cap() before either calls record().
+            if self.cap_usd is not None:
+                agg = self._read_month_total_unlocked()
+                if agg.total_usd + entry.cost_usd > self.cap_usd:
+                    raise LedgerCapError(
+                        f"monthly cap ${self.cap_usd:.2f} would be exceeded "
+                        f"(${agg.total_usd:.4f} spent + ${entry.cost_usd:.6f} new)"
+                    )
+            with self.path.open("a") as f:
+                f.write(json.dumps(asdict(entry)) + "\n")
         return entry
 
     def month_total(self, month: str | None = None) -> MonthAggregate:
+        """Return aggregate for *month* (YYYY-MM). Thread-safe."""
+        with self._lock:
+            return self._read_month_total_unlocked(month)
+
+    def _read_month_total_unlocked(self, month: str | None = None) -> MonthAggregate:
+        """Read month total without acquiring the lock (caller must hold _lock)."""
         if month is None:
             month = date.today().strftime("%Y-%m")
         agg = MonthAggregate(month=month)
@@ -87,12 +112,13 @@ class Ledger:
         return agg
 
     def check_cap(self) -> None:
-        """Raise RuntimeError if monthly cap is exceeded."""
+        """Raise LedgerCapError if monthly cap is exceeded. Thread-safe."""
         if self.cap_usd is None:
             return
-        agg = self.month_total()
+        with self._lock:
+            agg = self._read_month_total_unlocked()
         if agg.total_usd >= self.cap_usd:
-            raise RuntimeError(
-                f"cheap-llm monthly cap ${self.cap_usd:.2f} reached "
+            raise LedgerCapError(
+                f"monthly cap ${self.cap_usd:.2f} reached "
                 f"(spent ${agg.total_usd:.2f} across {agg.calls} calls)"
             )
