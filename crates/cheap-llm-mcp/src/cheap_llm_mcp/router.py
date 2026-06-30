@@ -10,6 +10,18 @@ from .providers import Completion, Message, OpenAICompatProvider
 log = logging.getLogger(__name__)
 
 
+class RouterError(Exception):
+    """Base error for router failures."""
+
+
+class RouterConfigError(RouterError):
+    """Raised when a provider is not found in config."""
+
+
+class RouterCompletionError(RouterError):
+    """Raised when all providers fail to complete a request."""
+
+
 class Router:
     """Dispatches completion requests to the right provider with fallback."""
 
@@ -21,7 +33,7 @@ class Router:
     def _get(self, name: str) -> OpenAICompatProvider:
         if name not in self._providers:
             if name not in self.cfg.providers:
-                raise KeyError(f"Unknown provider: {name!r}")
+                raise RouterConfigError(f"Unknown provider: {name!r}")
             self._providers[name] = OpenAICompatProvider(self.cfg.providers[name])
         return self._providers[name]
 
@@ -85,7 +97,7 @@ class Router:
             except Exception as e:
                 log.warning("provider %s failed: %s", name, e)
                 last_error = e
-        raise RuntimeError(f"All providers failed; last: {last_error!r}")
+        raise RouterCompletionError(f"All providers failed; last: {last_error!r}")
 
     async def stream(
         self,

@@ -12,7 +12,7 @@ from cheap_llm_mcp.ledger import (
 )
 from cheap_llm_mcp.logging_util import request_scope, setup_json_logging
 from cheap_llm_mcp.retry import with_retry
-from cheap_llm_mcp.router import Router
+from cheap_llm_mcp.router import Router, RouterConfigError, RouterCompletionError, RouterError
 
 __version__ = "0.1.0"
 
@@ -24,6 +24,9 @@ __all__ = [
     "MonthAggregate",
     "ProviderConfig",
     "Router",
+    "RouterConfigError",
+    "RouterCompletionError",
+    "RouterError",
     "TTLCache",
     "estimate_cost_usd",
     "load_config",

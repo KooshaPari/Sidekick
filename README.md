@@ -22,7 +22,7 @@ cargo test --workspace
 ![AI-Only-Maintained](https://img.shields.io/badge/Planned%20%26%20Maintained%20by-AI%20Agents%20Only-red?style=flat-square)
 ![HITL-less](https://img.shields.io/badge/HITL--less%20AI--DD-metaproject-yellow?style=flat-square)
 
-> ⚠️ **AI-Agent-Only Repository**
+> **AI-Agent-Only Repository**
 >
 > This repo is **planned, maintained, and managed exclusively by AI Agents**.
 > Slop issues, rough edges, and AI artifacts are **expected and intentionally

@@ -15,13 +15,13 @@ hero:
 
 features:
   - title: Rust Workspace
-    icon: 🦀
+    icon: ⚙
     details: Compiled Rust 2021 edition crates with strict linting and full test coverage.
   - title: Python Integration
-    icon: 🐍
+    icon: ▶
     details: FastMCP server for budget LLM routing, vendored as a Python sub-package.
   - title: Phenotype Native
-    icon: 🔗
+    icon: ⇌
     details: Designed for the Phenotype collections ecosystem — emit dispatch events, integrate with phenoEvents.
 ---
 

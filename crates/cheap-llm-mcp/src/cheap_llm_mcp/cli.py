@@ -3,11 +3,25 @@ from __future__ import annotations
 import argparse
 import asyncio
 import json
+import os
 import sys
 
 from .config import load as load_config
 from .ledger import Ledger
 from .router import Router
+
+
+def _use_symbols() -> bool:
+    """Return True unless NO_COLOR is set (see https://no-color.org/)."""
+    return os.environ.get("NO_COLOR") is None
+
+
+def _ok_mark() -> str:
+    return "[OK]" if not _use_symbols() else "\u2713"  # ✓
+
+
+def _fail_mark() -> str:
+    return "[FAIL]" if not _use_symbols() else "\u2717"  # ✗
 
 
 async def _run(args: argparse.Namespace) -> None:
@@ -66,11 +80,11 @@ async def _doctor() -> int:
             out = await p.health()
             ok = out["status"] == "ok"
             rc |= 0 if ok else 1
-            mark = "✓" if ok else "✗"
+            mark = _ok_mark() if ok else _fail_mark()
             print(f"  {mark} {name:10s} {out['latency_ms']}ms  {out.get('error', '')}")
         except Exception as e:
             rc |= 1
-            print(f"  ✗ {name:10s} setup error: {type(e).__name__}: {e}")
+            print(f"  {_fail_mark()} {name:10s} setup error: {type(e).__name__}: {e}")
     # Ledger summary
     ledger = Ledger(
         path=__import__("pathlib").Path.home() / ".cheap-llm" / "ledger.jsonl",
