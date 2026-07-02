@@ -9,19 +9,28 @@ export default defineConfig({
 
   // Only the docs-site pages should be treated as source content.
   // Other markdown files under docs/ are existing repo documentation
-  // (boundary/intent/journeys/security/operations/worklogs and similar)
+  // (audit/boundary/intent/journeys/operations/remediation/security/worklogs)
   // and must NOT be picked up by VitePress — they contain template-style
   // markup that the Vue markdown compiler would otherwise choke on.
   srcExclude: [
+    'audit/**',
     'boundary/**',
     'intent/**',
     'journeys/**',
     'operations/**',
+    'remediation/**',
     'security/**',
     'worklogs/**',
     'FUNCTIONAL_REQUIREMENTS.md',
     'consolidation_notes.md',
     'slsa.md',
+  ],
+
+  // Ignore dead links in excluded documentation directories
+  ignoreDeadLinks: [
+    // Remediation and operations docs contain cross-links that may not resolve
+    /^\/remediation\//,
+    /^\/operations\//,
   ],
 
   themeConfig: {
