@@ -1,6 +1,8 @@
 [workspace]
 members = [
     "crates/sidekick-messaging",
+    "crates/sidekick-obs-core",
+    "crates/sidekick-observability",
   ]
 resolver = "2"
 
@@ -14,6 +16,9 @@ repository = "https://github.com/KooshaPari/Sidekick"
 [workspace.dependencies]
 serde = { version = "1.0", features = ["derive"] }
 thiserror = "2.0"
+
+[workspace.metadata.cargo-machete]
+ignored = ["tracing"]
 
 [profile.release]
 opt-level = 3
