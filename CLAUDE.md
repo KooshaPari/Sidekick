@@ -6,7 +6,7 @@ Sidekick is a polyglot Rust + Python workspace of agent utility crates for the P
 
 - **Name**: Sidekick
 - **Type**: Named collection (workspace, not monorepo)
-- **Language Stack**: Rust (2021 edition), Python (FastMCP)
+- **Language Stack**: Rust (2021 edition)
 - **Location**: `/Users/kooshapari/CodeProjects/Phenotype/repos/Sidekick`
 - **Published**: crates.io (crate prefix: `sidekick-*`)
 
@@ -33,7 +33,6 @@ agileplus status <id> --wp <wp> --state <state>
 |-------|--------|---------|
 | `sidekick-presence` | agent-user-status | User presence + status tracking |
 | `sidekick-dispatch` | thegent-dispatch | Multi-provider agent dispatch |
-| `cheap-llm-mcp`      | vendored, updated 2026-06-08 | Budget LLM routing (FastMCP + Python) |
 | `sidekick-messaging` | TBD (agent-imessage) | Multi-provider messaging (deferred) |
 
 **FYI:** agent-user-status is a Sidekick-canonical peer of agent-imessage (both MCP servers for agent infrastructure). Both repos maintain independent FR traceability and test coverage under Sidekick governance.

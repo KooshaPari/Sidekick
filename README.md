@@ -55,7 +55,6 @@ A named Rust workspace consolidating core agent infrastructure utilities for the
 | Name | Repository | Status | FR Prefix | FR Coverage | Purpose |
 |------|-----------|--------|-----------|-------------|---------|
 | **agent-user-status** | [agent-user-status](../agent-user-status) | CANONICAL | FR-USR | 67/67 | User presence & status tracking (MCP server) |
-| **cheap-llm-mcp** | [cheap-llm-mcp](../cheap-llm-mcp) | CANONICAL | FR-LLM | 38/38 | Budget LLM routing (FastMCP + Python) |
 | **sidekick-messaging** | [Sidekick/crates/sidekick-messaging](./crates/sidekick-messaging) | CANONICAL | FR-MSG | Pending | iMessage/SMS messaging bridge adapter (Rust stub) |
 
 ### Rejected Candidates
@@ -70,7 +69,6 @@ A named Rust workspace consolidating core agent infrastructure utilities for the
 **Sidekick canonical standard:** All canonical members maintain 100% functional requirement traceability.
 
 - **agent-user-status**: 67 FRs, 100% traced to tests
-- **cheap-llm-mcp**: 38 FRs, 100% traced to tests
 - **sidekick-messaging**: FR scaffolding pending integration
 
 See [docs/FUNCTIONAL_REQUIREMENTS.md](docs/FUNCTIONAL_REQUIREMENTS.md) for the current
@@ -87,16 +85,14 @@ cargo test --workspace
 ## Integration Map
 
 - **agent-user-status** — MCP tools: `user_status`, `record_presence_signal`, `set_user_status`, eye-tracking, presence signals
-- **cheap-llm-mcp** — Skill routing for low-cost LLM completions (Minimax, Kimi, Fireworks)
 - **sidekick-messaging** — Unified messaging adapter (stub); wraps iMessage, SMS, email via agent-imessage skill
-- **PhenoAgent** — Foundational agent framework; integrates cheap-llm-mcp + agent-user-status + sidekick-messaging
+- **PhenoAgent** — Foundational agent framework; integrates agent-user-status + sidekick-messaging
 - **phenotype-skills** — Shared skill definitions consumed by PhenoAgent and external agents
 
 ## Architecture
 
-Sidekick is a polyglot workspace:
+Sidekick is a Rust workspace:
 - **Rust crates** (`crates/sidekick-*`): Compiled binaries and libraries
-- **Python sub-package** (`crates/sidekick-cheap-llm`): FastMCP wrapper, imported as Python module
 
 Each sub-crate is independently versioned and consumable; consumers import only what they need.
 

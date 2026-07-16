@@ -1,394 +1,1323 @@
 {
-  "repo": "Sidekick",
-  "overall": 50,
-  "grade": "D+",
-  "scores": {
-    "L1 Architecture": 0,
-    "L2 Dev Loop": 10,
-    "L3 Agent Loop": 40,
-    "L4 Observability": 65,
-    "L5 Security": 100,
-    "L6 Performance": 25,
-    "L7 Extensibility": 25,
-    "L8 Compliance": 30,
-    "L9 Complexity": 100,
-    "L10 Type Safety": 50,
-    "L11 Dependencies": 40,
-    "L12 Error Handling": 55,
-    "L13 Logging": 55,
-    "L14 Data Layer": 70,
-    "L15 API Surface": 50,
-    "L16 Frontend": 90,
-    "L17 I18n/A11y": 45,
-    "L18 Concurrency": 60,
-    "L19 Memory": 45,
-    "L20 Config": 50,
-    "L21 Testing Depth": 40,
-    "L22 Fuzzing": 35,
-    "L23 Release": 40,
-    "L24 Migration": 50,
-    "L25 Vendor Lockin": 100,
-    "L26 Event Driven": 55,
-    "L27 Infrastructure": 35,
-    "L28 Cost Efficiency": 55,
-    "L29 Monitoring": 30,
-    "L30 Onboarding": 60
+  "meta": {
+    "repo": "Sidekick",
+    "audit_date": "2026-07-09",
+    "taxonomy": "140-pillar / 10 domains",
+    "overall_score_pct": 41.6,
+    "overall_grade": "D+",
+    "total_pillars": 140,
+    "max_score": 700,
+    "obtained_score": 291
   },
-  "details": {
-    "L1 Architecture": {
-      "details": "No source files found.",
-      "raw": {}
+  "domains": [
+    {
+      "id": "A",
+      "name": "Architecture & Design",
+      "score_pct": 48.6,
+      "grade": "D",
+      "pillar_count": 14,
+      "obtained": 34,
+      "max": 70,
+      "pillars": [
+        {
+          "id": "A01",
+          "name": "Hexagonal / Ports-Adapters Architecture",
+          "score": 2,
+          "max_score": 5,
+          "rationale": "MessagingAdapter trait exists (crates/sidekick-messaging/src/lib.rs:64-70) but zero adapter implementations exist in tree. No infra layer, no adapter registry.",
+          "remediation": "Implement at least one real adapter (IMessageAdapter or SmsAdapter) behind the trait. Add adapter registry with dynamic dispatch."
+        },
+        {
+          "id": "A02",
+          "name": "Single Responsibility / Cohesion",
+          "score": 3,
+          "max_score": 5,
+          "rationale": "sidekick-messaging crate is small (96 LOC) and focused. However, README claims 4 canonical members (sidekick-messaging, sidekick-dispatch, sidekick-presence, cheap-llm-mcp) but only 1 is a workspace member.",
+          "remediation": "Reconcile README member list with Cargo.toml workspace members. Either add missing crates or demote README claims."
+        },
+        {
+          "id": "A03",
+          "name": "Open/Closed Principle",
+          "score": 3,
+          "max_score": 5,
+          "rationale": "MessagingAdapter trait provides an open extension point for new providers. Zero production adapters registered.",
+          "remediation": "Implement at least one adapter; consider adapter registry for dynamic provider discovery."
+        },
+        {
+          "id": "A04",
+          "name": "Dependency Inversion",
+          "score": 2,
+          "max_score": 5,
+          "rationale": "Trait abstraction exists in principle, but Cargo.toml has an unused path dependency on phenotype-errors (Cargo.toml:22) that couples the workspace to a cross-repo path.",
+          "remediation": "Remove unused workspace dependencies. Publish shared crates to crates.io or use git dependencies instead of path deps."
+        },
+        {
+          "id": "A05",
+          "name": "DRY \u2014 Docs vs Code Alignment",
+          "score": 1,
+          "max_score": 5,
+          "rationale": "README.md:37-47 claims 4 crate members; Cargo.toml:2-4 declares only sidekick-messaging. docs/consolidation_notes.md:11-14 lists crates absent from tree. No single SSOT for membership.",
+          "remediation": "Establish single SSOT for workspace membership (Cargo.toml). Update all docs to match. Delete consolidation_notes.md or rewrite from Cargo.toml."
+        },
+        {
+          "id": "A06",
+          "name": "Module Boundaries / Workspace Hygiene",
+          "score": 1,
+          "max_score": 5,
+          "rationale": "Only sidekick-messaging is a workspace member. sidekick-obs-core, sidekick-observability, and sidekick-dispatch exist under crates/ but are excluded. vendored cheap-llm-mcp is gitignored.",
+          "remediation": "Add all crates under crates/ to workspace members, or move them out of crates/ to avoid ambiguity."
+        },
+        {
+          "id": "A07",
+          "name": "Coupling / Cohesion Balance",
+          "score": 2,
+          "max_score": 5,
+          "rationale": "Messaging crate self-contained with minimal deps (serde, thiserror). However, workspace declares path dep to ../pheno/crates/phenotype-errors which is unused \u2014 creates unnecessary cross-repo coupling.",
+          "remediation": "Remove unused deps. Consider publishing sidekick-messaging independently of workspace."
+        },
+        {
+          "id": "A08",
+          "name": "Dependency Direction (Inward)",
+          "score": 2,
+          "max_score": 5,
+          "rationale": "Workspace Cargo.toml:20-22 declares anyhow and phenotype-errors as workspace deps. Neither is consumed by sidekick-messaging. Two dead deps increase cognitive load.",
+          "remediation": "Remove anyhow and phenotype-errors from workspace.dependencies. Only declare deps that are actually used."
+        },
+        {
+          "id": "A09",
+          "name": "Layered Architecture (Domain/App/Infra)",
+          "score": 1,
+          "max_score": 5,
+          "rationale": "Flat lib.rs pattern \u2014 no domain/, ports/, or adapters/ module separation. All logic lives in a single module file.",
+          "remediation": "Restructure sidekick-messaging into domain/, ports/, and adapters/ modules. Separate domain types from I/O concerns."
+        },
+        {
+          "id": "A10",
+          "name": "No God Objects / Monoliths",
+          "score": 4,
+          "max_score": 5,
+          "rationale": "Main lib.rs is 96 lines with clear types. No god objects in the Rust side. Python server.py has module-level globals (_router, _ledger) which add risk.",
+          "remediation": "Inject Python globals as dependencies rather than module-level singletons."
+        },
+        {
+          "id": "A11",
+          "name": "Cyclic Dependency Freedom",
+          "score": 5,
+          "max_score": 5,
+          "rationale": "No cycles in Rust dependency graph. Workspace has simple star topology \u2014 each crate standalone with no inter-crate deps.",
+          "remediation": "Maintain current no-cycle policy. Use cargo-deny or CI check to prevent regressions."
+        },
+        {
+          "id": "A12",
+          "name": "Public Surface Minimalism",
+          "score": 3,
+          "max_score": 5,
+          "rationale": "Small, focused public API for sidekick-messaging (Message, MessageProvider, MessagingAdapter trait, MessagingError). release-registry.toml lists crates not in tree.",
+          "remediation": "Sync release-registry.toml with actual in-tree crates. Keep public surface small."
+        },
+        {
+          "id": "A13",
+          "name": "Dead Flexibility / Unused Abstraction",
+          "score": 2,
+          "max_score": 5,
+          "rationale": "release-registry.toml:10-24 lists dispatch and presence crates as 'stub' and 'alpha' but they are absent from crates/. MessagingAdapter trait has no implementations beyond test stubs.",
+          "remediation": "Either import the referenced crates or remove them from registry. Add adapter implementations or mark trait as experimental."
+        },
+        {
+          "id": "A14",
+          "name": "YAGNI Discipline",
+          "score": 3,
+          "max_score": 5,
+          "rationale": "MessagingAdapter trait before a second implementation exists \u2014 YAGNI risk. However, the workspace is young and trait-first is defensible for a message abstraction.",
+          "remediation": "Document trait design intent. If only 1 provider for v1, consider inlining the trait until 2nd provider emerges."
+        }
+      ]
     },
-    "L2 Dev Loop": {
-      "details": "0 test files, 0 collected, 0 errors.",
-      "raw": {}
+    {
+      "id": "B",
+      "name": "Domain Modeling & Types",
+      "score_pct": 47.1,
+      "grade": "D",
+      "pillar_count": 14,
+      "obtained": 33,
+      "max": 70,
+      "pillars": [
+        {
+          "id": "B01",
+          "name": "Invariants Encoded In Types",
+          "score": 2,
+          "max_score": 5,
+          "rationale": "Message struct (lib.rs:41-46) allows empty body and empty recipient. No non-empty validation at construction.",
+          "remediation": "Add NonEmptyString newtype with TryFrom<&str> validation. Use it in Message fields."
+        },
+        {
+          "id": "B02",
+          "name": "Illegal States Unrepresentable",
+          "score": 2,
+          "max_score": 5,
+          "rationale": "MessageProvider enum prevents invalid combo strings but provider/recipient pairing isn't validated (e.g. Email provider with a phone number allowed).",
+          "remediation": "Add newtype Recipient types per provider channel (RecipientEmail, E164Phone). Match provider variant to recipient type at construction."
+        },
+        {
+          "id": "B03",
+          "name": "Newtypes Over Primitives",
+          "score": 1,
+          "max_score": 5,
+          "rationale": "recipient: String, body: String (lib.rs:43-44). No domain newtypes for any field.",
+          "remediation": "Introduce Recipient, MessageBody, MessageId newtypes. Each newtype validates at construction."
+        },
+        {
+          "id": "B04",
+          "name": "Ubiquitous Language",
+          "score": 3,
+          "max_score": 5,
+          "rationale": "MessageProvider::IMessage, SMS, Email clearly named. README uses 'sidekick-presence' and 'sidekick-dispatch' names not present in Cargo.toml members.",
+          "remediation": "Align glossary across README, docs, and Cargo.toml. Drop references to crates not in workspace."
+        },
+        {
+          "id": "B05",
+          "name": "Enum Exhaustiveness",
+          "score": 4,
+          "max_score": 5,
+          "rationale": "Display match on MessageProvider covers all 3 variants (lib.rs:31-37). No wildcard arms. serde uses exhaustive derive.",
+          "remediation": "Consider adding #[non_exhaustive] if providers will be added by downstream crates."
+        },
+        {
+          "id": "B06",
+          "name": "Error Type Design",
+          "score": 4,
+          "max_score": 5,
+          "rationale": "MessagingError enum with thiserror derives (lib.rs:14-20). Clear error messages. ProviderUnavailable and Unauthorized variants.",
+          "remediation": "Wire Unauthorized into actual adapter implementations. Consider adding a third variant for transport errors."
+        },
+        {
+          "id": "B07",
+          "name": "Option/Result Discipline",
+          "score": 3,
+          "max_score": 5,
+          "rationale": "Result<T> alias defined (lib.rs:11). No ? propagation paths currently because adapters are stubs.",
+          "remediation": "Implement real adapters with ? propagation. Add From impls for upstream error types."
+        },
+        {
+          "id": "B08",
+          "name": "No Stringly-Typed IDs",
+          "score": 1,
+          "max_score": 5,
+          "rationale": "Plain String for recipient and body. No MessageId type. No way to reference messages externally.",
+          "remediation": "Add MessageId(Uuid) newtype. Return MessageId from MessagingAdapter::send instead of String."
+        },
+        {
+          "id": "B09",
+          "name": "Value vs Entity Distinction",
+          "score": 2,
+          "max_score": 5,
+          "rationale": "Message is a value object (no identity). No Conversation or Thread aggregate model, which would be needed for multi-turn messaging.",
+          "remediation": "Model Thread aggregate if conversational use case emerges. Document as value object for now."
+        },
+        {
+          "id": "B10",
+          "name": "ID Schemes / External Correlation",
+          "score": 1,
+          "max_score": 5,
+          "rationale": "No message ID scheme. No way to correlate sent messages to provider-side receipts. correlation module exists in obs-core but not wired.",
+          "remediation": "Define MessageId as UUID v4. Document external provider ID mapping strategy (e.g. provider_message_id field)."
+        },
+        {
+          "id": "B11",
+          "name": "Serde Contracts",
+          "score": 3,
+          "max_score": 5,
+          "rationale": "Serialize + Deserialize derived on domain types (lib.rs:42). No schema versioning. No deny_unknown_fields.",
+          "remediation": "Add #[serde(deny_unknown_fields)] on structs receiving external input. Add version field to persisted schemas."
+        },
+        {
+          "id": "B12",
+          "name": "Clone/Debug Conventions",
+          "score": 4,
+          "max_score": 5,
+          "rationale": "All public types derive Debug + Clone + PartialEq + Eq where appropriate, per CLAUDE.md convention.",
+          "remediation": "Maintain on all new types. Consider adding Serialize bounds where serialization is expected."
+        },
+        {
+          "id": "B13",
+          "name": "Python Typed Models",
+          "score": 2,
+          "max_score": 5,
+          "rationale": "Python config.py uses @dataclass for config models. But the broader cheap-llm-mcp codebase mixes typed and untyped patterns.",
+          "remediation": "Extend dataclass usage to runtime request/response models. Consider pydantic for validation."
+        },
+        {
+          "id": "B14",
+          "name": "Validation at Construction",
+          "score": 1,
+          "max_score": 5,
+          "rationale": "Message::new (lib.rs:50-60) accepts any Into<String> with no trim or non-empty checks. Empty body or recipient accepted silently.",
+          "remediation": "Add try_new() -> Result<Self> with validation. Move validation upstream of construction."
+        }
+      ]
     },
-    "L3 Agent Loop": {
-      "details": "CLI: MISSING. CI: 11 workflows.",
-      "raw": {}
+    {
+      "id": "C",
+      "name": "API / Interface Design",
+      "score_pct": 38.6,
+      "grade": "F",
+      "pillar_count": 14,
+      "obtained": 27,
+      "max": 70,
+      "pillars": [
+        {
+          "id": "C01",
+          "name": "REST Resource Modeling",
+          "score": 0,
+          "max_score": 5,
+          "rationale": "No HTTP API in workspace. Entire surface is MCP-tool based. No route design, no HTTP verbs.",
+          "remediation": "Document that Sidekick is MCP-native (not REST). If HTTP API is needed, design resource model around messaging/dispatch."
+        },
+        {
+          "id": "C02",
+          "name": "CLI Ergonomics",
+          "score": 3,
+          "max_score": 5,
+          "rationale": "cheap-llm-mcp CLI includes doctor subcommand and help. Rust side provides sidekick-healthcheck binary. No unified CLI wrapper.",
+          "remediation": "Add root CLI (sidekick CLI) with subcommands for health, messaging, dispatch. Document in README quickstart."
+        },
+        {
+          "id": "C03",
+          "name": "Versioning Policy",
+          "score": 2,
+          "max_score": 5,
+          "rationale": "Workspace version 0.0.1 (Cargo.toml:8). Python pyproject.toml uses 0.4.0. Version skew between Rust and Python packages.",
+          "remediation": "Adopt unified version policy for the collection. Consider independent semver per crate with workspace tracking."
+        },
+        {
+          "id": "C04",
+          "name": "Request/Response Contracts",
+          "score": 2,
+          "max_score": 5,
+          "rationale": "MessagingAdapter::send returns bare String (lib.rs:66) instead of structured SendReceipt. MCP tools return typed dicts on Python side.",
+          "remediation": "Define SendReceipt struct with message_id, provider_status, timestamp. Use in trait return type."
+        },
+        {
+          "id": "C05",
+          "name": "Idempotency Support",
+          "score": 1,
+          "max_score": 5,
+          "rationale": "No idempotency keys. Retry may duplicate sends when MessagingAdapter is wired to real providers.",
+          "remediation": "Add optional idempotency_key: Option<String> to Message. Document deduplication strategy if applicable."
+        },
+        {
+          "id": "C06",
+          "name": "Pagination Strategy",
+          "score": 0,
+          "max_score": 5,
+          "rationale": "No list/query APIs that require pagination. Acceptable for current scope but needs documentation.",
+          "remediation": "Document pagination as N/A in API spec. If list endpoints added, use cursor-based pagination."
+        },
+        {
+          "id": "C07",
+          "name": "HTTP Status Semantics",
+          "score": 3,
+          "max_score": 5,
+          "rationale": "Python retry.py:15 defines RETRYABLE_STATUS set. Code distinguishes retryable vs terminal errors. Rust side has no HTTP layer.",
+          "remediation": "Expose retry policy in docs. Map MessagingError variants to HTTP status codes where applicable."
+        },
+        {
+          "id": "C08",
+          "name": "Backward Compatibility",
+          "score": 2,
+          "max_score": 5,
+          "rationale": "cargo-semver-checks.yml configured for sidekick-messaging only. Python MCP tools not covered. Pre-1.0, breaking changes likely.",
+          "remediation": "Add semver-check for all workspace crates. Document compatibility policy for Python MCP surface."
+        },
+        {
+          "id": "C09",
+          "name": "Schema Documentation (OpenAPI/MCP)",
+          "score": 1,
+          "max_score": 5,
+          "rationale": "No OpenAPI spec. MCP tool schemas are in code only \u2014 no generated manifest published. no docs/reference for MCP surface.",
+          "remediation": "Generate MCP tool schema manifest (JSON Schema). Publish in docs/ during CI build."
+        },
+        {
+          "id": "C10",
+          "name": "Input Contracts & Validation",
+          "score": 3,
+          "max_score": 5,
+          "rationale": "MCP tools use typed parameters with Literal provider params (server.py:52). Config TOML parsed with validation. Rust trait accepts any Message.",
+          "remediation": "Add input validation at trait boundary in Rust. Derive validation specs from MCP tool schemas."
+        },
+        {
+          "id": "C11",
+          "name": "MCP Tool Surface Completeness",
+          "score": 3,
+          "max_score": 5,
+          "rationale": "complete, health, stream_complete tools exist in Python MCP server. Messaging crate has no MCP exposure \u2014 no bridge layer.",
+          "remediation": "Bridge sidekick-messaging to MCP tools or document deferral in roadmap."
+        },
+        {
+          "id": "C12",
+          "name": "Trait API Stability",
+          "score": 2,
+          "max_score": 5,
+          "rationale": "Pre-1.0 stubs (release-registry.toml:21 status=stub). Breaking changes expected. No versioning guarantees published.",
+          "remediation": "Stabilize MessagingAdapter trait before 0.1.0. Document experimental vs stable portions of API."
+        },
+        {
+          "id": "C13",
+          "name": "Error Mapping to API Surface",
+          "score": 2,
+          "max_score": 5,
+          "rationale": "MessagingError not exposed via MCP. Consumers cannot distinguish error types programmatically. Python side has partial error codes.",
+          "remediation": "Define error codes for each MessagingError variant. Include in MCP tool error responses."
+        },
+        {
+          "id": "C14",
+          "name": "Cost/Rate API Exposure",
+          "score": 3,
+          "max_score": 5,
+          "rationale": "Ledger.check_cap() in Python server tracks monthly spend. Rust side has no cost tracking. No user-facing quota API.",
+          "remediation": "Surface cost/rate information through health endpoint. Document ledger caps in README."
+        }
+      ]
     },
-    "L4 Observability": {
-      "details": "Docs: 6/8 canonical files.",
-      "raw": {}
+    {
+      "id": "D",
+      "name": "Testing Quality",
+      "score_pct": 32.9,
+      "grade": "F",
+      "pillar_count": 14,
+      "obtained": 23,
+      "max": 70,
+      "pillars": [
+        {
+          "id": "D01",
+          "name": "Unit Test Coverage",
+          "score": 3,
+          "max_score": 5,
+          "rationale": "34 #[test] functions total across 14 test files (including stubs). Messaging lib has 3 inline tests. obs-core has solid module-level tests.",
+          "remediation": "Expand unit tests to cover all public functions. Target 80%+ coverage on core logic."
+        },
+        {
+          "id": "D02",
+          "name": "Integration Tests",
+          "score": 2,
+          "max_score": 5,
+          "rationale": "obs-core integration.rs tests cross-module interactions. Messaging stubs are contract-level only. No real adapter integration tests.",
+          "remediation": "Add integration tests exercising MessagingAdapter through real trait dispatch. Use mock providers."
+        },
+        {
+          "id": "D03",
+          "name": "End-to-End Tests",
+          "score": 1,
+          "max_score": 5,
+          "rationale": "No cross-crate E2E harness. No MCP round-trip test in CI. Smoke test (tests/smoke_test.rs) is trivial 2+2=4 assertion.",
+          "remediation": "Build E2E: clone \u2192 build \u2192 run healthcheck \u2192 MCP tool round-trip. Gate on CI."
+        },
+        {
+          "id": "D04",
+          "name": "Property-Based Tests",
+          "score": 0,
+          "max_score": 5,
+          "rationale": "No proptest or quickcheck dependency. Zero property-based tests in the codebase.",
+          "remediation": "Add proptest for Message serialization round-trip, MessagingAdapter contract invariants."
+        },
+        {
+          "id": "D05",
+          "name": "BDD / Acceptance Tests",
+          "score": 0,
+          "max_score": 5,
+          "rationale": "No Gherkin, no BDD framework. No .feature files.",
+          "remediation": "Optional \u2014 only if stakeholder acceptance requires behavior-driven scenarios."
+        },
+        {
+          "id": "D06",
+          "name": "Coverage Tracking & Enforcement",
+          "score": 1,
+          "max_score": 5,
+          "rationale": "No coverage tool configured. docs/reference/fr_coverage_matrix.md reports zero FRs. No CI gate on coverage.",
+          "remediation": "Add cargo-tarpaulin or llvm-cov. Publish coverage report in CI. Set minimum coverage threshold."
+        },
+        {
+          "id": "D07",
+          "name": "Meaningful Assertions",
+          "score": 2,
+          "max_score": 5,
+          "rationale": "Smoke test (tests/smoke_test.rs:7) asserts 2+2=4. Several stubs have basic true/false checks. Some deeper assertions in obs-core tests.",
+          "remediation": "Replace trivial smoke test with workspace invariant. Strengthen stub assertions to validate contract semantics."
+        },
+        {
+          "id": "D08",
+          "name": "Fixtures / Factories / Test Helpers",
+          "score": 2,
+          "max_score": 5,
+          "rationale": "Python has conftest.py with fixtures. Rust side has no shared test utilities, no MessageBuilder pattern.",
+          "remediation": "Add shared test module with MessageBuilder, StubAdapter factory, and common test assertions."
+        },
+        {
+          "id": "D09",
+          "name": "Determinism & Isolation",
+          "score": 4,
+          "max_score": 5,
+          "rationale": "No random values used in Rust tests. Stubs have no external dependencies. Python tests use httpx mocks.",
+          "remediation": "Seed RNG in tests if randomization is added. Maintain no-network-required test patterns."
+        },
+        {
+          "id": "D10",
+          "name": "Test Isolation / No Shared State",
+          "score": 3,
+          "max_score": 5,
+          "rationale": "Rust tests are well-isolated with independent stubs. Python server.py globals present risk of cross-test pollution.",
+          "remediation": "Reset module-level globals between Python tests. Use dependency injection instead of globals."
+        },
+        {
+          "id": "D11",
+          "name": "Mutation Resistance",
+          "score": 1,
+          "max_score": 5,
+          "rationale": "No mutation testing configured. With minimal test coverage, mutation survival would be high.",
+          "remediation": "Add cargo-mutants or similar once coverage baseline is established."
+        },
+        {
+          "id": "D12",
+          "name": "Performance / Load Tests",
+          "score": 0,
+          "max_score": 5,
+          "rationale": "No benchmark harness. No criterion benches. No Python benchmarking.",
+          "remediation": "Add criterion benchmarks for send path and provider resolution. Add pytest-benchmark for MCP tools."
+        },
+        {
+          "id": "D13",
+          "name": "Contract Tests",
+          "score": 2,
+          "max_score": 5,
+          "rationale": "Stub adapters define contract. Python has @pytest.mark.requirement markers. Rust lacks FR\u2192test linkage annotations.",
+          "remediation": "Adopt #[fr(\"FR-MSG-001\")] proc-macro or document FR\u2192test mapping in test comments."
+        },
+        {
+          "id": "D14",
+          "name": "Flaky-Free CI Pipeline",
+          "score": 2,
+          "max_score": 5,
+          "rationale": "Rust CI passes consistently. Python suite not gated in CI \u2014 risk of drift. No network-dependent tests currently.",
+          "remediation": "Add Python job to ci.yml with uv run pytest. Keep all tests network-free with mocks."
+        }
+      ]
     },
-    "L5 Security": {
-      "details": "Secret-like patterns: 0.",
-      "raw": {}
+    {
+      "id": "E",
+      "name": "CI/CD & Release",
+      "score_pct": 47.1,
+      "grade": "D",
+      "pillar_count": 14,
+      "obtained": 33,
+      "max": 70,
+      "pillars": [
+        {
+          "id": "E01",
+          "name": "Pipeline Completeness",
+          "score": 4,
+          "max_score": 5,
+          "rationale": "11 workflows: ci, cargo-deny, cargo-audit, cargo-machete, cargo-semver-checks, codeql, trufflehog, scorecard, docs, release-attestation, sbom-refresh. Strong breadth.",
+          "remediation": "Add unified CI gate with all checks aggregated. Add Python workflow."
+        },
+        {
+          "id": "E02",
+          "name": "cargo fmt --check Gate",
+          "score": 2,
+          "max_score": 5,
+          "rationale": "pre-commit-config.yaml:12 has fmt hook (client-side). ci.yml lacks cargo fmt --check. Formatting not enforced server-side.",
+          "remediation": "Add cargo fmt --check step to ci.yml before clippy."
+        },
+        {
+          "id": "E03",
+          "name": "Clippy Gate",
+          "score": 4,
+          "max_score": 5,
+          "rationale": "ci.yml:14 runs clippy with -D warnings. Consistent enforcement.",
+          "remediation": "Keep. Consider adding clippy for Python (ruff) as well."
+        },
+        {
+          "id": "E04",
+          "name": "Build Matrix Coverage",
+          "score": 1,
+          "max_score": 5,
+          "rationale": "All jobs run on ubuntu-latest only. No macOS or Windows testing. No Rust toolchain matrix (stable only).",
+          "remediation": "Add OS matrix (macOS + Windows) for test job. Add nightly toolchain for forward-compat check."
+        },
+        {
+          "id": "E05",
+          "name": "Release Artifacts Pipeline",
+          "score": 3,
+          "max_score": 5,
+          "rationale": "release-attestation.yml builds + stages artifacts. SLSA L2 attestation configured. Never triggered (0 tags, 0 releases).",
+          "remediation": "Define first release tag. Verify release-attestation.yml produces correct artifacts for lib-only crate."
+        },
+        {
+          "id": "E06",
+          "name": "Scheduled / Nightly Workflows",
+          "score": 3,
+          "max_score": 5,
+          "rationale": "Weekly cron on cargo-audit (Wed), cargo-deny (Mon), cargo-machete (Thu), scorecard (Sat), codeql (Tue). No nightly full suite.",
+          "remediation": "Add nightly workflow running the full test matrix + all security scans."
+        },
+        {
+          "id": "E07",
+          "name": "E2E / Integration Workflow",
+          "score": 0,
+          "max_score": 5,
+          "rationale": "No E2E workflow. No smoke test across Rust + Python boundary.",
+          "remediation": "Add e2e.yml: build \u2192 start MCP server \u2192 run python MCP client \u2192 verify response."
+        },
+        {
+          "id": "E08",
+          "name": "Artifact Integrity & Signing",
+          "score": 3,
+          "max_score": 5,
+          "rationale": "SLSA build attestation configured via slsa-framework for releases. Not yet exercised. Release pipeline assumes binary output but sidekick-messaging is lib-only.",
+          "remediation": "Test attestation workflow. Add crate publishing step. Handle lib-only crate correctly."
+        },
+        {
+          "id": "E09",
+          "name": "Cache Strategy",
+          "score": 4,
+          "max_score": 5,
+          "rationale": "Swatinem/rust-cache in main CI and release workflow. Cargo registry + target directory cached. No Python/uv cache.",
+          "remediation": "Add uv/pip cache if Python CI is added."
+        },
+        {
+          "id": "E10",
+          "name": "Required Checks Documented",
+          "score": 3,
+          "max_score": 5,
+          "rationale": "CLAUDE.md lists quality gates (fmt, clippy, test). README references them. Branch protection not in-repo.",
+          "remediation": "Document required checks in CONTRIBUTING.md with explicit list. Add branch protection rules file."
+        },
+        {
+          "id": "E11",
+          "name": "Rollback Procedure",
+          "score": 0,
+          "max_score": 5,
+          "rationale": "No rollback procedure documented. No revert strategy for crate publishes or deployments.",
+          "remediation": "Write one-page rollback runbook covering: crate revert, git revert, tag removal."
+        },
+        {
+          "id": "E12",
+          "name": "Changelog / Release Notes",
+          "score": 2,
+          "max_score": 5,
+          "rationale": "CHANGELOG.md present (37 lines) but Unreleased section is empty. No release notes for any version (0 tags).",
+          "remediation": "Maintain changelog entries per PR. Generate release notes on tag push (cliff.toml or similar)."
+        },
+        {
+          "id": "E13",
+          "name": "CI Cost Efficiency",
+          "score": 4,
+          "max_score": 5,
+          "rationale": "All jobs on free-tier ubuntu-latest. Cargo caching reduces rebuild time. Workflows use minimal compute.",
+          "remediation": "Keep free tier. Monitor GitHub Actions minutes as matrix expands."
+        },
+        {
+          "id": "E14",
+          "name": "Python / Polyglot CI",
+          "score": 0,
+          "max_score": 5,
+          "rationale": "No pytest, ruff, mypy, or Python CI job. 52 Python files in tree are ungated. No uv.lock or pyproject.toml at root.",
+          "remediation": "Add Python CI job with uv sync, ruff check, pytest. Gate on cheap-llm-mcp tests."
+        }
+      ]
     },
-    "L6 Performance": {
-      "details": "Async defs: 0, awaits: 0.",
-      "raw": {}
+    {
+      "id": "F",
+      "name": "Security & Compliance",
+      "score_pct": 67.1,
+      "grade": "D+",
+      "pillar_count": 14,
+      "obtained": 47,
+      "max": 70,
+      "pillars": [
+        {
+          "id": "F01",
+          "name": "Authentication Layer",
+          "score": 2,
+          "max_score": 5,
+          "rationale": "MCP server has no auth layer (server.py). Open local trust model appropriate for stdio transport but undocumented.",
+          "remediation": "Document threat model for local MCP trust. Add optional token-based auth for SSE transport."
+        },
+        {
+          "id": "F02",
+          "name": "Authorization Enforcement",
+          "score": 2,
+          "max_score": 5,
+          "rationale": "MessagingError::Unauthorized variant exists (lib.rs:18-19) but never constructed. No authorization logic.",
+          "remediation": "Enforce authorization when multi-tenant or when sensitive operations are added."
+        },
+        {
+          "id": "F03",
+          "name": "Secrets via Environment / No Hardcoding",
+          "score": 4,
+          "max_score": 5,
+          "rationale": "API keys read from environment variables (config.py:20-24). .env.example under cheap-llm-mcp/. No secrets in Rust code.",
+          "remediation": "Add root .env.example aggregating all env vars. Document required env vars per crate."
+        },
+        {
+          "id": "F04",
+          "name": "Dependency CVE Auditing",
+          "score": 5,
+          "max_score": 5,
+          "rationale": "cargo-audit.yml runs weekly (Wed cron) plus on pushes to Cargo.toml/Cargo.lock. Uses rustsec/audit-check with GITHUB_TOKEN.",
+          "remediation": "Keep. Consider adding pip-audit for Python dependencies."
+        },
+        {
+          "id": "F05",
+          "name": "Supply Chain / Pinned Actions",
+          "score": 3,
+          "max_score": 5,
+          "rationale": "cargo-deny.yml, cargo-audit.yml, scorecard.yml use SHA-pinned actions. ci.yml uses @v4 and @v2 floating tags. trufflehog.yml uses @main (unpinned). Mixed.",
+          "remediation": "Pin all actions to SHA digests. Use dependabot for SHA updates. Fix trufflehog.yml to use release tag not @main."
+        },
+        {
+          "id": "F06",
+          "name": "SBOM Management",
+          "score": 4,
+          "max_score": 5,
+          "rationale": "sbom.cdx.json present. sbom-refresh.yml monthly cron. docs/security/sbom.json lists 68 components. CycloneDX format. Python SBOM not generated.",
+          "remediation": "Add Python dependency SBOM. Fix sbom.json metadata (currently says 'FocalPoint' instead of 'Sidekick')."
+        },
+        {
+          "id": "F07",
+          "name": "Input Validation at Boundaries",
+          "score": 3,
+          "max_score": 5,
+          "rationale": "Config TOML validated (config.py:58-65). MCP tool prompt length not bounded. Rust inputs validated only through serde deserialization.",
+          "remediation": "Add max prompt size guard for MCP tools. Add length validation in Message constructors."
+        },
+        {
+          "id": "F08",
+          "name": "Injection / Output Safety",
+          "score": 3,
+          "max_score": 5,
+          "rationale": "No SQL injection risk. Prompts passed to upstream LLM providers with sanitization controlled by provider. No output sanitization on messages.",
+          "remediation": "Add log redaction for sensitive fields. Consider prompt injection guard at MCP boundary."
+        },
+        {
+          "id": "F09",
+          "name": "TLS / Transport Security",
+          "score": 4,
+          "max_score": 5,
+          "rationale": "Default URLs use HTTPS (config.py:80-102). Rust has no HTTP client yet.",
+          "remediation": "Enforce TLS in custom provider configs. Document TLS expectations."
+        },
+        {
+          "id": "F10",
+          "name": "Least Privilege (CI Permissions)",
+          "score": 4,
+          "max_score": 5,
+          "rationale": "Most workflows use permissions: read-all. Release workflow uses id-token: write (justified for attestation). Scorecard uses security-events: write.",
+          "remediation": "Review per-workflow permissions. Add explicit permissions blocks to workflows missing them."
+        },
+        {
+          "id": "F11",
+          "name": "Rate Limiting / Cost Caps",
+          "score": 3,
+          "max_score": 5,
+          "rationale": "Ledger implements monthly cost cap (server.py:64). Per-request rate limiting absent. Token bucket not implemented.",
+          "remediation": "Add per-request rate limiter with configurable TPM/TPD. Surface rate limit status in health endpoint."
+        },
+        {
+          "id": "F12",
+          "name": "Secret Scanning",
+          "score": 4,
+          "max_score": 5,
+          "rationale": "trufflehog.yml runs on push to main + PRs. Uses --only-verified. Unpinned @main tag is a risk.",
+          "remediation": "Pin trufflehog to a release tag. Add gitleaks as complementary scanning."
+        },
+        {
+          "id": "F13",
+          "name": "CODEOWNERS Coverage",
+          "score": 3,
+          "max_score": 5,
+          "rationale": "CODEOWNERS present with @KooshaPari as single owner for all patterns. Covers workflows, Cargo.toml, deny.toml. No backup owner.",
+          "remediation": "Add backup reviewer/owner to CODEOWNERS patterns. Consider team-based ownership."
+        },
+        {
+          "id": "F14",
+          "name": "SAST / CodeQL Coverage",
+          "score": 3,
+          "max_score": 5,
+          "rationale": "codeql.yml configured for Rust analysis only. Runs weekly + on push/PR to main. Python files not analyzed by CodeQL.",
+          "remediation": "Add languages: python to CodeQL analysis matrix. Add explicit python analysis job."
+        }
+      ]
     },
-    "L7 Extensibility": {
-      "details": "0 source files. Config: 0 features.",
-      "raw": {}
+    {
+      "id": "G",
+      "name": "Observability & Monitoring",
+      "score_pct": 34.3,
+      "grade": "F",
+      "pillar_count": 14,
+      "obtained": 24,
+      "max": 70,
+      "pillars": [
+        {
+          "id": "G01",
+          "name": "Structured Logging",
+          "score": 3,
+          "max_score": 5,
+          "rationale": "sidekick-observability crate provides init_tracing() with JSON output. Python has JsonFormatter. Neither is wired into application code.",
+          "remediation": "Wire init_tracing() into sidekick-messaging binary entry point. Add tracing-subscriber as dependency."
+        },
+        {
+          "id": "G02",
+          "name": "Log Level Configuration",
+          "score": 3,
+          "max_score": 5,
+          "rationale": "Rust sidekick_log_levels module provides LogLevel enum and env-driven config. Respects RUST_LOG. Python has CHEAP_LLM_LOG_LEVEL.",
+          "remediation": "Document all env vars for log configuration in a single place. Add default level policies per crate."
+        },
+        {
+          "id": "G03",
+          "name": "Metrics Export (Prometheus)",
+          "score": 2,
+          "max_score": 5,
+          "rationale": "Metrics module defines Counter/Histogram traits, no-op impl, and InMemoryMetrics for test. Standard names defined (METRIC_DISPATCH_TOTAL, etc.). No production export.",
+          "remediation": "Implement MetricsRegistry backed by prometheus crate. Expose /metrics endpoint. Wire into sidekick-messaging."
+        },
+        {
+          "id": "G04",
+          "name": "Tracing / Spans",
+          "score": 1,
+          "max_score": 5,
+          "rationale": "tracing dep declared in workspace Cargo.toml:19. sidekick-obs-core provides CorrelationContext. Zero #[instrument] attributes in codebase. Zero tracing! macros.",
+          "remediation": "Add #[instrument] to MessagingAdapter::send. Create spans for each operation with crate, op, provider fields."
+        },
+        {
+          "id": "G05",
+          "name": "Health / Readiness Probes",
+          "score": 3,
+          "max_score": 5,
+          "rationale": "HealthReport and ReadinessReport types in obs-core. sidekick-healthcheck binary exists. ComponentCheck for structured probe results.",
+          "remediation": "Wire healthcheck into CI smoke test. Add readiness check for MCP server availability."
+        },
+        {
+          "id": "G06",
+          "name": "Error Reporting / Sinks",
+          "score": 2,
+          "max_score": 5,
+          "rationale": "Basic JSON logging captures errors. No Sentry, Datadog, or external error sink configured. No panic hook for crash collection.",
+          "remediation": "Add optional Sentry/error sink behind feature flag. Set up panic hook that logs panic details."
+        },
+        {
+          "id": "G07",
+          "name": "Correlation ID Propagation",
+          "score": 3,
+          "max_score": 5,
+          "rationale": "CorrelationContext type provides request_id + trace_id. CorrelationStore for thread-safe propagation. Python has request_scope. Neither wired into production flow.",
+          "remediation": "Propagate correlation_id through MCP tool invocations and dispatch boundaries. Log in every span."
+        },
+        {
+          "id": "G08",
+          "name": "Dashboards",
+          "score": 0,
+          "max_score": 5,
+          "rationale": "No dashboard definitions in repo. No Grafana JSON, no Datadog dashboard config.",
+          "remediation": "Add sample Grafana dashboard JSON for: dispatch throughput, error rate, latency p50/p95/p99."
+        },
+        {
+          "id": "G09",
+          "name": "Alerting Rules",
+          "score": 0,
+          "max_score": 5,
+          "rationale": "No alerting configuration. No SLO burns alerts, no cost cap alerts, no error rate alerts.",
+          "remediation": "Define at least 3 alert rules: cost cap breach, sustained error rate >5%, health check failure."
+        },
+        {
+          "id": "G10",
+          "name": "Audit Trail / Ledger",
+          "score": 3,
+          "max_score": 5,
+          "rationale": "cheap-llm-mcp has JSONL ledger for cost tracking. Dispatch storage stubs define JSONL schema. Messaging sends not logged.",
+          "remediation": "Add audit logging for message sends (recipient_hash, provider, status, timestamp)."
+        },
+        {
+          "id": "G11",
+          "name": "Tracing Integration (Rust)",
+          "score": 2,
+          "max_score": 5,
+          "rationale": "sidekick-observability crate built but not wired into sidekick-messaging or any binary. tracing-subscriber deps present but init not called.",
+          "remediation": "Add sidekick-observability as dep to sidekick-messaging. Call init_tracing() at binary startup."
+        },
+        {
+          "id": "G12",
+          "name": "SLO Definitions",
+          "score": 0,
+          "max_score": 5,
+          "rationale": "No service level objectives documented. No latency targets, availability targets, or error budgets.",
+          "remediation": "Define initial SLO: MCP tool p99 latency < 5s, availability > 99.5%, error rate < 1%."
+        },
+        {
+          "id": "G13",
+          "name": "OpenTelemetry Export",
+          "score": 0,
+          "max_score": 5,
+          "rationale": "No OpenTelemetry SDK or exporter configured. No distributed tracing across service boundaries.",
+          "remediation": "Add opentelemetry-otlp behind feature flag. Configure optional export to OTel collector."
+        },
+        {
+          "id": "G14",
+          "name": "CI Failure Observability",
+          "score": 2,
+          "max_score": 5,
+          "rationale": "Standard GitHub Actions logs. No test report artifacts uploaded. No build insights dashboard.",
+          "remediation": "Upload test results as CI artifacts. Add JUnit report generation for Rust tests."
+        }
+      ]
     },
-    "L8 Compliance": {
-      "details": "Commits: 20. SSOT: False.",
-      "raw": {}
+    {
+      "id": "H",
+      "name": "Performance & Scalability",
+      "score_pct": 41.4,
+      "grade": "F",
+      "pillar_count": 14,
+      "obtained": 29,
+      "max": 70,
+      "pillars": [
+        {
+          "id": "H01",
+          "name": "Hot-Path Profiling",
+          "score": 0,
+          "max_score": 5,
+          "rationale": "No profiling data collected. No flamegraph or perf recording in docs or scripts.",
+          "remediation": "Add cargo flamegraph script and profiling guide. Profile adapter send path and provider resolution."
+        },
+        {
+          "id": "H02",
+          "name": "Async/Concurrency Correctness",
+          "score": 2,
+          "max_score": 5,
+          "rationale": "MessagingAdapter trait is sync (lib.rs:64). Python MCP server has async def complete (server.py:49). Hybrid sync/async may block event loop.",
+          "remediation": "Consider making MessagingAdapter::send async (trait-variant or async-trait). Document blocking expectations."
+        },
+        {
+          "id": "H03",
+          "name": "Caching Strategy",
+          "score": 3,
+          "max_score": 5,
+          "rationale": "Python TTL cache for provider responses (router.py:19,56-69). Rust side has no caching. Provider availability results uncached.",
+          "remediation": "Cache provider availability checks in Rust. Add TTL-based cache with configurable expiry."
+        },
+        {
+          "id": "H04",
+          "name": "N+1 Query / Call Prevention",
+          "score": 2,
+          "max_score": 5,
+          "rationale": "Provider fallback iterates sequentially (router.py:72-80). Health checks to all providers done sequentially, not parallel.",
+          "remediation": "Run provider health probes in parallel with tokio::join! or futures::join_all."
+        },
+        {
+          "id": "H05",
+          "name": "Resource Bounds",
+          "score": 2,
+          "max_score": 5,
+          "rationale": "max_tokens default 4096 in Python server. No global concurrency limit. No semaphore on inflight requests.",
+          "remediation": "Add Semaphore-based concurrency limit. Define max_concurrent_requests config per provider."
+        },
+        {
+          "id": "H06",
+          "name": "Streaming vs Buffering",
+          "score": 3,
+          "max_score": 5,
+          "rationale": "stream_complete MCP tool + streaming tests exist (test_streaming.py). Rust messaging has no streaming \u2014 acceptable for message sends.",
+          "remediation": "Keep streaming in Python MCP. Document streaming deferral for Rust messaging crate."
+        },
+        {
+          "id": "H07",
+          "name": "Backpressure Mechanism",
+          "score": 1,
+          "max_score": 5,
+          "rationale": "No backpressure mechanism. Unbounded prompt size. No queue depth limits for dispatch.",
+          "remediation": "Add bounded channel for dispatch queue. Define max prompt size with configurable limit."
+        },
+        {
+          "id": "H08",
+          "name": "Algorithmic Complexity Awareness",
+          "score": 3,
+          "max_score": 5,
+          "rationale": "O(providers) loop for provider fallback \u2014 fine at small scale (3-4 providers). Documented as linear.",
+          "remediation": "Document scaling limits in architecture docs. Add early-exit optimization for healthy provider."
+        },
+        {
+          "id": "H09",
+          "name": "Load Ceiling Documentation",
+          "score": 1,
+          "max_score": 5,
+          "rationale": "No load ceiling documented. No max RPS / concurrent MCP calls specified.",
+          "remediation": "Document: max concurrent requests, max prompt tokens, recommended rate limits."
+        },
+        {
+          "id": "H10",
+          "name": "Memory Management",
+          "score": 2,
+          "max_score": 5,
+          "rationale": "Python module-level caches (_router, _ledger) potential growth (server.py:18-19). Rust has minimal allocation.",
+          "remediation": "Bound all caches with max_size. Add cache eviction policy. Document memory footprint."
+        },
+        {
+          "id": "H11",
+          "name": "Release Profile Tuning",
+          "score": 4,
+          "max_score": 5,
+          "rationale": "Profile.release sets opt-level=3, lto=true (Cargo.toml:24-26). No fat LTO or PGO, but standard tuning for perf.",
+          "remediation": "Consider fat LTO for single-crate release. Profile-guided optimization for binary deliverables."
+        },
+        {
+          "id": "H12",
+          "name": "HTTP Connection Reuse",
+          "score": 3,
+          "max_score": 5,
+          "rationale": "Python httpx clients handle connection pooling. No explicit pool tuning or keep-alive configuration.",
+          "remediation": "Configure httpx pool limits explicitly. Document connection reuse strategy."
+        },
+        {
+          "id": "H13",
+          "name": "Cost Efficiency Caps",
+          "score": 3,
+          "max_score": 5,
+          "rationale": "monthly_cost_cap_usd configurable (config.py:32). Ledger enforces monthly budget check before dispatch.",
+          "remediation": "Add per-request cost budgeting. Surface cost projections before expensive operations."
+        },
+        {
+          "id": "H14",
+          "name": "Benchmark Harness",
+          "score": 0,
+          "max_score": 5,
+          "rationale": "No benchmark harness. No criterion dependency. No pytest-benchmark. No regression detection for performance changes.",
+          "remediation": "Add criterion benchmark crate for MessagingAdapter::send. Add pytest-benchmark for MCP tools."
+        }
+      ]
     },
-    "L9 Complexity": {
-      "details": "Long funcs: 0, nested blocks: 0, branches: 0.",
-      "raw": {}
+    {
+      "id": "I",
+      "name": "Data & Persistence",
+      "score_pct": 15.7,
+      "grade": "F",
+      "pillar_count": 14,
+      "obtained": 11,
+      "max": 70,
+      "pillars": [
+        {
+          "id": "I01",
+          "name": "Schema Design & Documentation",
+          "score": 2,
+          "max_score": 5,
+          "rationale": "Message struct is the primary schema (lib.rs:41-46). JSONL ledger schema documented in DATA.md. No formal schema definition language used.",
+          "remediation": "Define formal schemas in DATA.md for all persisted data. Add JSON Schema files alongside ledger code."
+        },
+        {
+          "id": "I02",
+          "name": "Versioned Schema Migrations",
+          "score": 0,
+          "max_score": 5,
+          "rationale": "No migration framework. No version history for data schemas. JSONL format could diverge between versions.",
+          "remediation": "Add version field to all persisted entries. Create migration/ directory with reversible scripts."
+        },
+        {
+          "id": "I03",
+          "name": "Referential Integrity",
+          "score": 1,
+          "max_score": 5,
+          "rationale": "No relational database. JSONL files are independent. No cross-file referential integrity. Acceptable for stateless design.",
+          "remediation": "Document intentional lack of referential integrity in ADR. Add integrity checks if SQLite is adopted."
+        },
+        {
+          "id": "I04",
+          "name": "Indexing Strategy",
+          "score": 0,
+          "max_score": 5,
+          "rationale": "No database, no indexes. JSONL files read linearly. No strategy for efficient query.",
+          "remediation": "N/A until datastore is added. Document indexing plan if SQLite is used for dispatch."
+        },
+        {
+          "id": "I05",
+          "name": "Backup / Restore Procedures",
+          "score": 0,
+          "max_score": 5,
+          "rationale": "No backup procedure. No restore documentation. Ledger data could be lost on crash or filesystem failure.",
+          "remediation": "Document backup: cp ~/.cheap-llm/ledger.jsonl to backup location. Add optional WAL-based SQLite for crash safety."
+        },
+        {
+          "id": "I06",
+          "name": "Transaction Support",
+          "score": 0,
+          "max_score": 5,
+          "rationale": "No transactional writes. JSONL append is atomic per-line but multiple lines aren't transactional. No write-ahead log.",
+          "remediation": "Use SQLite for transactional writes where atomicity required. JSONL is acceptable for append-only audit logs."
+        },
+        {
+          "id": "I07",
+          "name": "Data Validation on Persist",
+          "score": 2,
+          "max_score": 5,
+          "rationale": "Ledger append writes serde-validated data. No schema validation on read (JSONL deserialization). Corrupted entries crash.",
+          "remediation": "Add schema validation on ledger read with skip-and-warn on corrupt entries. Version field for format detection."
+        },
+        {
+          "id": "I08",
+          "name": "Consistency Model Definition",
+          "score": 1,
+          "max_score": 5,
+          "rationale": "Append-only JSONL \u2014 no crash safety spec. No fsync guarantee. No ACID properties.",
+          "remediation": "Document consistency guarantees per storage component. Add fsync option for ledger writes."
+        },
+        {
+          "id": "I09",
+          "name": "Persistence Layer Abstraction",
+          "score": 1,
+          "max_score": 5,
+          "rationale": "File path hardcoded in server.py:35. LedgerStore trait not defined. Not injectable for testing.",
+          "remediation": "Define LedgerStore trait with FileLedger and InMemoryLedger impls. Inject via constructor, not global."
+        },
+        {
+          "id": "I10",
+          "name": "Serde / Serialization for Persistence",
+          "score": 2,
+          "max_score": 5,
+          "rationale": "JSON lines format for ledger. Serde derived on Message. No version field per entry. No backward-compat fields.",
+          "remediation": "Add version field to all persisted entries. Use #[serde(default)] for forward-compat fields."
+        },
+        {
+          "id": "I11",
+          "name": "Reversible Migrations",
+          "score": 0,
+          "max_score": 5,
+          "rationale": "No migration system. No up/down scripts. Schema changes not reversible.",
+          "remediation": "N/A until versioned store is needed. Add reversible migration scripts when SQLite is adopted."
+        },
+        {
+          "id": "I12",
+          "name": "Encryption at Rest",
+          "score": 0,
+          "max_score": 5,
+          "rationale": "No encryption for persisted data. Ledger may contain metadata about prompts and usage. Recipient data in message fields.",
+          "remediation": "Add optional encryption for sensitive ledger fields. Document when encryption is needed."
+        },
+        {
+          "id": "I13",
+          "name": "Retention Policy",
+          "score": 1,
+          "max_score": 5,
+          "rationale": "Ledger grows unbounded (configurable monthly cap but no rotation/archival). No data lifecycle management.",
+          "remediation": "Define retention: ledger compaction job, archival on rotation, deletion after N months."
+        },
+        {
+          "id": "I14",
+          "name": "ORM / SQL Abstraction",
+          "score": 1,
+          "max_score": 5,
+          "rationale": "No ORM, no SQL. Intentionally stateless for messaging crate. Python uses JSONL. Acceptable for current design.",
+          "remediation": "Document intentional omission of ORM. If SQLite added, consider sqlx for Rust."
+        }
+      ]
     },
-    "L10 Type Safety": {
-      "details": "Type coverage: 0/0 (0%). Dataclasses: 0.",
-      "raw": {}
+    {
+      "id": "J",
+      "name": "Documentation & Governance",
+      "score_pct": 42.9,
+      "grade": "F",
+      "pillar_count": 14,
+      "obtained": 30,
+      "max": 70,
+      "pillars": [
+        {
+          "id": "J01",
+          "name": "README Quality & Completeness",
+          "score": 4,
+          "max_score": 5,
+          "rationale": "README is 199 lines with work-state header, architecture section, usage examples, quality gates. Well-structured for a young project.",
+          "remediation": "Add live CI badges. Ensure member table matches workspace. Add Python setup instructions."
+        },
+        {
+          "id": "J02",
+          "name": "Quickstart / Getting Started",
+          "score": 2,
+          "max_score": 5,
+          "rationale": "docs/getting-started.md exists but clone-only flow fails due to path dependency on ../pheno. Python setup not integrated.",
+          "remediation": "Make clone-and-build work standalone. Document or remove path deps. Add uv sync step for Python."
+        },
+        {
+          "id": "J03",
+          "name": "Install / Setup Documentation",
+          "score": 3,
+          "max_score": 5,
+          "rationale": "rust-toolchain.toml pins toolchain. Taskfile.yml lists tasks. justfile imports shared recipes. Python setup via uv not documented at root.",
+          "remediation": "Add root documentation section for Python dependencies. Document uv setup for cheap-llm-mcp."
+        },
+        {
+          "id": "J04",
+          "name": "API Reference Documentation",
+          "score": 2,
+          "max_score": 5,
+          "rationale": "Rust doc comments on public items. No cargo doc published. MCP tools documented inline only. No rendered doc site for crate API.",
+          "remediation": "Publish cargo doc via GitHub Pages. Add MCP tool reference doc in docs/."
+        },
+        {
+          "id": "J05",
+          "name": "Runnable Examples",
+          "score": 1,
+          "max_score": 5,
+          "rationale": "No examples/ directory. README bash blocks untested in CI. No standalone example crate.",
+          "remediation": "Create examples/ directory with runnable Rust + Python examples tested in CI."
+        },
+        {
+          "id": "J06",
+          "name": "Onboarding Experience",
+          "score": 2,
+          "max_score": 5,
+          "rationale": "CONTRIBUTING.md is thin (23 lines). Devcontainer exists but CLAUDE.md quality gates not enforced in CI. Python env setup not documented.",
+          "remediation": "Expand CONTRIBUTING.md with full setup guide: env vars, Python deps, Rust toolchain, CI gate overview."
+        },
+        {
+          "id": "J07",
+          "name": "CONTRIBUTING Quality",
+          "score": 2,
+          "max_score": 5,
+          "rationale": "CONTRIBUTING.md present at 23 lines \u2014 covers basics but no code style section for Python, no PR checklist, no review process.",
+          "remediation": "Add Python code style section (ruff conventions). Add PR checklist template. Link to code review policy."
+        },
+        {
+          "id": "J08",
+          "name": "Docs Site / VitePress",
+          "score": 3,
+          "max_score": 5,
+          "rationale": "VitePress site with GitHub Pages deployment (docs.yml). docs/index.md, .vitepress/config.mjs configured. Several propagated stubs in intent/boundary.",
+          "remediation": "Fill intent and boundary doc stubs (docs/intent/sidekick.md has <To be filled>). Add more sections to nav."
+        },
+        {
+          "id": "J09",
+          "name": "ADR Discipline",
+          "score": 0,
+          "max_score": 5,
+          "rationale": "Zero ADRs in repository. docs/worklogs/ARCHITECTURE.md is a scaffold only. No architecturally-significant decisions documented.",
+          "remediation": "Write ADR-001: workspace scope and stateless messaging design. ADR-002: MCP-only API surface."
+        },
+        {
+          "id": "J10",
+          "name": "FR/NFR Specification Quality",
+          "score": 2,
+          "max_score": 5,
+          "rationale": "docs/FUNCTIONAL_REQUIREMENTS.md exists but uses SIDE-* IDs unrelated to actual code. cheap-llm-mcp has separate FR set. No unified FR registry.",
+          "remediation": "Rewrite FR/NFR spec from actual domain. Consolidate cheap-llm-mcp and sidekick requirements into single registry."
+        },
+        {
+          "id": "J11",
+          "name": "Governance Artifacts Completeness",
+          "score": 4,
+          "max_score": 5,
+          "rationale": "STATUS.md \u2713, SSOT.md \u2713, BRAND.md \u2713, SUPPORT.md \u2713, CITATION.cff \u2713, CODE_OF_CONDUCT \u2713, FUNDING.yml \u2713, SECURITY.md \u2713. Strong set of governance files.",
+          "remediation": "Keep all artifacts current. Add quarterly review cadence for stale files."
+        },
+        {
+          "id": "J12",
+          "name": "Traceability (FR \u2192 Impl \u2192 Test)",
+          "score": 2,
+          "max_score": 5,
+          "rationale": "Python tests use @pytest.mark.requirement markers. Rust tests lack FR annotations. Root FR spec IDs (SIDE-*) unrelated to cheap-llm-* FRs in Python.",
+          "remediation": "Adopt FR ID convention used consistently across Rust + Python. Add CI check verifying FR\u2194test mapping."
+        },
+        {
+          "id": "J13",
+          "name": "No Orphan / Dead Code",
+          "score": 2,
+          "max_score": 5,
+          "rationale": "2 dead workspace deps: anyhow (Cargo.toml:20), phenotype-errors (Cargo.toml:22). release-registry.toml lists crates not in tree. docs reference absent crates.",
+          "remediation": "Remove dead workspace deps. Sync release-registry.toml with actual tree. Fix docs referencing missing crates."
+        },
+        {
+          "id": "J14",
+          "name": "Audit Scorecard Accuracy",
+          "score": 1,
+          "max_score": 5,
+          "rationale": "Existing audit_scorecard.json:39 says 'No source files found' \u2014 false negative. Many counters show 0 for existing data. Scorecard not regenerated from actual code.",
+          "remediation": "Regenerate scorecard from live code analysis. Automate scorecard generation in CI or as Makefile target."
+        }
+      ]
+    }
+  ],
+  "score_summary": {
+    "A_Architecture": {
+      "pct": 48.6,
+      "grade": "D",
+      "obtained": 34,
+      "max": 70
     },
-    "L11 Dependencies": {
-      "details": "Lock: False, Requirements: False.",
-      "raw": {}
+    "B_Domain_Modeling": {
+      "pct": 47.1,
+      "grade": "D",
+      "obtained": 33,
+      "max": 70
     },
-    "L12 Error Handling": {
-      "details": "Try blocks: 0, bare excepts: 0, custom exceptions: 0, retry: 0.",
-      "raw": {}
+    "C_API_Design": {
+      "pct": 38.6,
+      "grade": "F",
+      "obtained": 27,
+      "max": 70
     },
-    "L13 Logging": {
-      "details": "Logger imports: 0, structured: 0.",
-      "raw": {}
+    "D_Testing": {
+      "pct": 32.9,
+      "grade": "F",
+      "obtained": 23,
+      "max": 70
     },
-    "L14 Data Layer": {
-      "details": "ORM: 0, Migrations: 0, Redis: 0, SQLite: 0.",
-      "raw": {}
+    "E_CICD_Release": {
+      "pct": 47.1,
+      "grade": "D",
+      "obtained": 33,
+      "max": 70
     },
-    "L15 API Surface": {
-      "details": "FastAPI: 0, Flask: 0, Endpoints: 0, OpenAPI: 0.",
-      "raw": {}
+    "F_Security": {
+      "pct": 67.1,
+      "grade": "D+",
+      "obtained": 47,
+      "max": 70
     },
-    "L16 Frontend": {
-      "details": "HTML: 3, JS: 0, CSS: 0, Templates: 0, React: 0.",
-      "raw": {}
+    "G_Observability": {
+      "pct": 34.3,
+      "grade": "F",
+      "obtained": 24,
+      "max": 70
     },
-    "L17 I18n/A11y": {
-      "details": "Locale files: 0, gettext: 0, aria: 0.",
-      "raw": {}
+    "H_Performance": {
+      "pct": 41.4,
+      "grade": "F",
+      "obtained": 29,
+      "max": 70
     },
-    "L18 Concurrency": {
-      "details": "Threading: 0, MP: 0, Locks: 0, Queue: 0.",
-      "raw": {}
+    "I_Data_Persistence": {
+      "pct": 15.7,
+      "grade": "F",
+      "obtained": 11,
+      "max": 70
     },
-    "L19 Memory": {
-      "details": "Context managers: 0, GC: 0, Weakref: 0, Cleanup: 0.",
-      "raw": {}
+    "J_Docs_Governance": {
+      "pct": 42.9,
+      "grade": "F",
+      "obtained": 30,
+      "max": 70
     },
-    "L20 Config": {
-      "details": "Env refs: 0, Dotenv: 0, Pydantic: 0, Config files: 53.",
-      "raw": {}
-    },
-    "L21 Testing Depth": {
-      "details": "Parametrize: 0, Fixtures: 0, Mock: 0, Patch: 0.",
-      "raw": {}
-    },
-    "L22 Fuzzing": {
-      "details": "Hypothesis: 0, Fuzzing: 0, Property tests: 0.",
-      "raw": {}
-    },
-    "L23 Release": {
-      "details": "Version file: False, Tags: 0, Semver: 0, Changelog: True.",
-      "raw": {}
-    },
-    "L24 Migration": {
-      "details": "Deprecated: 0, Warnings: 0, Migrations: 0.",
-      "raw": {}
-    },
-    "L25 Vendor Lockin": {
-      "details": "AWS: 0, Azure: 0, GCP: 0, Generic: 0.",
-      "raw": {}
-    },
-    "L26 Event Driven": {
-      "details": "Event bus: 0, Queue: 0, Pubsub: 0, Kafka: 0, Celery: 0.",
-      "raw": {}
-    },
-    "L27 Infrastructure": {
-      "details": "Docker: 0, Compose: 0, K8s: 0, Terraform: 0.",
-      "raw": {}
-    },
-    "L28 Cost Efficiency": {
-      "details": "Batching: 0, N+1: 0, Bulk: 0, Pagination: 0.",
-      "raw": {}
-    },
-    "L29 Monitoring": {
-      "details": "Prometheus: 0, Health: 0, Tracing: 0, Metrics: 0, SLO: 0.",
-      "raw": {}
-    },
-    "L30 Onboarding": {
-      "details": "Makefile: 0, Devcontainer: 1, Setup: 2, README: 0.",
-      "raw": {}
+    "OVERALL": {
+      "pct": 41.6,
+      "grade": "D+",
+      "obtained": 291,
+      "max": 700
     }
   },
-  "raw": {
-    "source": {
-      "total": 0,
-      "over_500": 0,
-      "over_350": 0,
-      "oversized_files": []
-    },
-    "tests": {
-      "total": 0,
-      "unit": 0,
-      "integration": 0,
-      "e2e": 0,
-      "files": []
-    },
-    "collection": {
-      "collected": 0,
-      "errors": 0,
-      "timeout": false,
-      "raw_output": ""
-    },
-    "cli": {
-      "exists": false,
-      "cmd": null,
-      "has_subcommands": false,
-      "help_length": 0
-    },
-    "docs": {
-      "has_docs_dir": true,
-      "files": {
-        "README": true,
-        "ARCHITECTURE": false,
-        "SSOT": false,
-        "CLAUDE": true,
-        "AGENTS": true,
-        "CONTRIBUTING": true,
-        "CHANGELOG": true,
-        "LICENSE": true
-      }
-    },
-    "security": {
-      "hardcoded_api_key": 0,
-      "hardcoded_secret": 0,
-      "hardcoded_password": 0,
-      "hardcoded_token": 0
-    },
-    "benchmarks": {
-      "has_benchmarks": false,
-      "has_contract_smoke": false,
-      "has_context7_smoke": false,
-      "has_check_regression": false
-    },
-    "async": {
-      "async_def": 0,
-      "await": 0,
-      "asyncio_import": 0,
-      "httpx_import": 0,
-      "aiohttp_import": 0
-    },
-    "pyproject": {
-      "exists": false
-    },
-    "git": {
-      "has_git": true,
-      "recent_commits": 20,
-      "has_merge_commits": false
-    },
-    "ci": {
-      "has_github_actions": true,
-      "workflow_files": [
-        "cargo-deny.yml",
-        "sbom-refresh.yml",
-        "trufflehog.yml",
-        "codeql.yml",
-        "cargo-machete.yml",
-        "release-attestation.yml",
-        "cargo-audit.yml",
-        "ci.yml",
-        "cargo-semver-checks.yml",
-        "codeql-rust.yml",
-        "scorecard.yml"
-      ],
-      "has_precommit": true
-    },
-    "complexity": {
-      "long_functions": 0,
-      "nested_blocks": 0,
-      "branches": 0
-    },
-    "type_safety": {
-      "annotated_funcs": 0,
-      "total_funcs": 0,
-      "dataclasses": 0,
-      "protocols": 0,
-      "typeddicts": 0,
-      "generics": 0
-    },
-    "dependencies": {
-      "has_lock": false,
-      "has_requirements": false,
-      "has_constraints": false,
-      "dep_count": 0
-    },
-    "error_handling": {
-      "try_blocks": 0,
-      "bare_excepts": 0,
-      "custom_exceptions": 0,
-      "retry_decorators": 0
-    },
-    "logging": {
-      "logger_imports": 0,
-      "structured_logging": 0
-    },
-    "data_layer": {
-      "orm_refs": 0,
-      "migration_files": 0,
-      "redis_refs": 0,
-      "sqlite_refs": 0
-    },
-    "api_surface": {
-      "fastapi": 0,
-      "flask": 0,
-      "endpoints": 0,
-      "openapi": 0
-    },
-    "frontend": {
-      "html_files": 3,
-      "js_files": 0,
-      "css_files": 0,
-      "templates": 0,
-      "react_components": 0
-    },
-    "i18n_a11y": {
-      "locale_files": 0,
-      "gettext_refs": 0,
-      "aria_refs": 0
-    },
-    "concurrency": {
-      "threading_refs": 0,
-      "multiprocessing_refs": 0,
-      "lock_refs": 0,
-      "queue_refs": 0
-    },
-    "memory": {
-      "context_managers": 0,
-      "gc_refs": 0,
-      "weakref_refs": 0,
-      "cleanup_refs": 0
-    },
-    "config": {
-      "env_refs": 0,
-      "dotenv_refs": 0,
-      "pydantic_settings": 0,
-      "config_files": 53
-    },
-    "testing_depth": {
-      "parametrize": 0,
-      "fixtures": 0,
-      "mock": 0,
-      "patch": 0
-    },
-    "fuzzing": {
-      "hypothesis": 0,
-      "fuzzing": 0,
-      "property_tests": 0
-    },
-    "release": {
-      "has_version_file": false,
-      "tag_count": 0,
-      "semver_tags": 0,
-      "has_changelog": true
-    },
-    "migration": {
-      "deprecated_decorators": 0,
-      "warning_refs": 0,
-      "migration_scripts": 0
-    },
-    "vendor_lockin": {
-      "aws_refs": 0,
-      "azure_refs": 0,
-      "gcp_refs": 0,
-      "generic_refs": 0
-    },
-    "event_driven": {
-      "event_bus": 0,
-      "queue": 0,
-      "pubsub": 0,
-      "kafka": 0,
-      "celery": 0
-    },
-    "infrastructure": {
-      "dockerfile": 0,
-      "docker_compose": 0,
-      "k8s_manifests": 0,
-      "terraform_files": 0
-    },
-    "cost_efficiency": {
-      "batching_refs": 0,
-      "n_plus_one_refs": 0,
-      "bulk_refs": 0,
-      "pagination_refs": 0
-    },
-    "monitoring": {
-      "prometheus": 0,
-      "health_checks": 0,
-      "tracing": 0,
-      "metrics": 0,
-      "slo": 0
-    },
-    "onboarding": {
-      "makefile": 0,
-      "devcontainer": 1,
-      "setup_scripts": 2,
-      "readme_setup": 0
-    },
-    "all_ast": {
-      "long_functions": 0,
-      "nested_blocks": 0,
-      "branches": 0,
-      "annotated_funcs": 0,
-      "total_funcs": 0,
-      "dataclasses": 0,
-      "protocols": 0,
-      "typeddicts": 0,
-      "generics": 0,
-      "async_def": 0,
-      "await": 0,
-      "asyncio_import": 0,
-      "httpx_import": 0,
-      "aiohttp_import": 0,
-      "try_blocks": 0,
-      "bare_excepts": 0,
-      "custom_exceptions": 0,
-      "retry_decorators": 0
-    }
-  }
+  "strongest_domains": [
+    "F_Security (67.1%)",
+    "A_Architecture (48.6%)",
+    "E_CICD_Release (47.1%)"
+  ],
+  "weakest_domains": [
+    "I_Data_Persistence (15.7%)",
+    "D_Testing (32.9%)",
+    "G_Observability (34.3%)"
+  ],
+  "score_summary_note": "Sidekick scores 41.6% (D+) on a 140-pillar / 10-domain taxonomy. Security is the strongest domain anchored by 11 CI workflows and solid security automation. Data & Persistence is weakest due to the intentionally stateless design without explicit ADR documentation. Testing and Observability also lag significantly \u2014 the observability crate exists but is not wired, and the 34 tests are mostly stubs. The project has strong governance artifacts (17 files) but suffers from doc-code drift (README claims crates not in workspace, dead deps)."
 }

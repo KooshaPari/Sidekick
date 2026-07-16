@@ -1,0 +1,5 @@
+[profile.ci]
+retries = 2
+
+[ci]
+junit = { path = "target/nextest/ci/junit.xml" }
